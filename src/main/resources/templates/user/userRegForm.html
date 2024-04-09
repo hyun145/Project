@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>회원가입</title>
+    <meta charset="UTF-8">
+    <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="/images/icons/favicon.ico"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/material-design-iconic-font.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/hamburgers.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/animsition.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/select2.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/daterangepicker.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/util.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <!--===============================================================================================-->
+    <script src="/js/jquery-3.6.0.min.js"></script>
+
+    <script type="text/javascript">
+
+        // 아이디 중복체크여부 (중복 Y / 중복아님 : N)
+        let userIdCheck = "Y";
+
+        let nickNameCheck = "Y";
+
+        let emailAuthNumber = "";
+
+        // HTML로딩이 완료되고, 실행됨
+        $(document).ready(function () {
+            let f = document.getElementById("f"); // form 태그
+
+            // 아이디 중복체크
+            $("#btnUserId").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                userIdExists(f)
+            })
+            $("#btnEmail").on("click", function () {
+                emailExists(f)
+            })
+            $("#btnNickName").on("click", function () {
+                nickNameExists(f)
+            })
+
+            // 회원가입
+            $("#btnSend").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                doSubmit(f);
+            })
+        })
+        function emailExists(f) {
+            if(f.email.value === "") {
+                alert("이메일을 입력하세요.")
+                f.email.focus();
+                return;
+            }
+            $.ajax({
+                url:"/user/getEmailExists",
+                type: "post",
+                datatype: "JSON",
+                data: $("#f").serialize(),
+                success: function (json) {
+                    if(json.existsYn ==="Y") {
+                        alert("이미 가입된 이메일 주소가 존재합니다.");
+                        f.email.focus();
+                    } else {
+                        alert("이메일로 인증번호가 발송되었습니다. \n받은 메일의 인증번호를 입력하시기 바랍니다.")
+                        emailAuthNumber = json.authNumber;
+
+                    }
+
+                }
+            })
+
+
+        }
+
+        // 회원아이디 중복 체크
+        function userIdExists(f) {
+            if (f.userId.value === "") {
+                alert("아이디를 입력하세요.");
+                f.userId.focus();
+                return;
+            }
+            // Ajax 호출해서 회원가입하기
+            $.ajax({
+                    url: "/user/getUserIdExists",
+                    type: "post", // 전송방식은 Post
+                    dataType: "JSON", // 전송 결과는 JSON으로 받기
+                    data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                    success: function (json) { // 호출이 성공했다면..
+                        if (json.existsYn === "Y") {
+                            alert("이미 가입된 아이디가 존재합니다.");
+                            f.userId.focus();
+                        } else { // 회원가입 실패
+                            alert("가입 가능한 아이디입니다.");
+                            userIdCheck = "N";
+                        }
+                    }
+                }
+            )
+        }
+        function nickNameExists(f) {
+            if(f.nickName.value ==="") {
+                alert("닉네임을 입력하세요.")
+
+                f.nickName.focus();
+                return;
+
+            }
+            $.ajax({
+                    url: "/user/getNickNameExists",
+                    type: "post",
+                    dataType: "JSON",
+                    data: $("#f").serialize(),
+                    success: function (json) {
+                        if (json.existsYn ==="Y") {
+                            alert("이미 가입된 아이디가 존재합니다.");
+                            f.nickName.focus();
+                        } else {
+                            alert("가입 가능한 닉네임입니다.");
+                            nickNameCheck = "N";
+                        }
+                    }
+
+            })
+
+        }
+
+        //회원가입 정보의 유효성 체크하기
+        function doSubmit(f) {
+            if (f.userId.value === "") {
+                alert("아이디를 입력하세요.");
+                f.userId.focus();
+                return;
+            }
+            if (userIdCheck !== "N") {
+                alert("아이디 중복 체크 및 중복되지 않은 아이디로 가입 바랍니다.");
+                f.userId.focus();
+                return;
+            }
+
+            if (nickNameCheck !== "N") {
+                alert("닉네임 중복 체크 및 중복되지 않는 닉네임으로 가입 바랍니다.");
+                f.nickName.focus();
+                return;
+            }
+            if (f.userName.value === "") {
+                alert("이름을 입력하세요.");
+                f.userName.focus();
+                return;
+            }
+            if (f.password.value === "") {
+                alert("비밀번호를 입력하세요.");
+                f.password.focus();
+                return;
+            }
+            if (f.password2.value === "") {
+                alert("비밀번호확인을 입력하세요.");
+                f.password2.focus();
+                return;
+            }
+            if (f.password.value !== f.password2.value) {
+                alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+                f.password.focus();
+                return;
+            }
+            if (f.email.value === "") {
+                alert("이메일을 입력하세요.");
+                f.email.focus();
+                return;
+            }
+
+
+
+            if (f.authNumber.value != emailAuthNumber) {
+                alert("인증번호가 일치하지 않습니다.");
+                f.authNumber.focus();
+                return;
+            }
+            // Ajax 호출해서 회원가입하기
+            $.ajax({
+                    url: "/user/insertUserInfo",
+                    type: "post", // 전송방식은 Post
+                    dataType: "JSON", // 전송 결과는 JSON으로 받기
+                    data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                    success: function (json) { // /user/insertUserInfo 호출이 성공했다면..
+                        if (json.result === 1) { // 회원가입 성공
+                            alert(json.msg); // 메시지 띄우기
+                            location.href = "/user/login"; // 로그인 페이지 이동
+                        } else { // 회원가입 실패
+                            alert(json.msg); // 메시지 띄우기
+                        }
+                    }
+                }
+            )
+        }
+
+
+    </script>
+
+
+
+
+</head>
+<body>
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <form class="login100-form validate-form" id="f">
+					<span class="login100-form-title p-b-26">
+						GradeAdvisor
+					</span>
+
+
+                    <div class="wrap-input100 validate-input"  data-validate = "아이디를 입력하세요.">
+                        <input class="input100" type="text" name="userId" id="userId" placeholder="아이디">
+
+                    </div>
+                    <div class="wrap-login100-form-btn">
+                        <div class="login100-form-bgbtn"></div>
+                        <button class="login100-form-btn" id="btnUserId" type="button">
+                           아이디 중복체크
+                        </button>
+                    </div>
+
+                    <div class="wrap-input100 validate-input"  data-validate = "이름을 입력하세요.">
+                        <input class="input100" type="text" name="userName" id="userName" placeholder="이름">
+                    </div>
+
+
+                    <div class="wrap-input100 validate-input" data-validate="비밀번호를 입력하세요.">
+						<span class="btn-show-pass">
+							<i class="zmdi zmdi-eye"></i>
+						</span>
+                        <input class="input100" type="password" name="password" id="password" placeholder="비밀번호" >
+
+                    </div>
+
+
+                    <div class="wrap-input100 validate-input" data-validate="비밀번호 확인 체크">
+						<span class="btn-show-pass">
+							<i class="zmdi zmdi-eye"></i>
+						</span>
+                        <input class="input100" type="password" name="password2" id="password2" placeholder="비밀번호 확인">
+                    </div>
+
+
+                    <div class="wrap-input100 validate-input"  data-validate = "닉네임을 입력하세요.">
+                        <input class="input100" type="text" name="nickName" id="nickName" placeholder="닉네임">
+                    </div>
+                    <div class="wrap-login100-form-btn">
+                        <div class="login100-form-bgbtn"></div>
+                        <button class="login100-form-btn" id="btnNickName" type="button">
+                            닉네임 중복체크
+                        </button>
+                    </div>
+
+
+
+                    <div class="wrap-input100 validate-input"  data-validate = "이메일을 입력하세요.">
+                        <input class="input100" type="email" name="email" id="email" placeholder="이메일">
+
+                    </div>
+                    <div class="wrap-login100-form-btn">
+                        <div class="login100-form-bgbtn"></div>
+                        <button class="login100-form-btn" id="btnEmail" type="button">
+                              인증번호 발송
+                        </button>
+                    </div>
+
+                    <div class="wrap-input100 validate-input"  data-validate = "인증번호를 입력하세요.">
+                        <input class="input100" type="text" name="authNumber" placeholder="인증번호">
+                    </div>
+
+
+
+                    <div class="container-login100-form-btn">
+                        <div class="wrap-login100-form-btn">
+                            <div class="login100-form-bgbtn"></div>
+                            <button class="login100-form-btn" id="btnSend" type="button">
+                                회원가입
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="dropDownSelect1"></div>
+
+<!--===============================================================================================-->
+<script src="/js/jquery-3.6.0.min.js"></script>
+<!--===============================================================================================-->
+<script src="/js/animsition.min.js"></script>
+<!--===============================================================================================-->
+<script src="/js/popper.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+<script src="/js/select2.min.js"></script>
+<!--===============================================================================================-->
+<script src="/js/moment.min.js"></script>
+<script src="/js/daterangepicker.js"></script>
+<!--===============================================================================================-->
+<script src="/js/countdowntime.js"></script>
+<!--===============================================================================================-->
+<script src="/js/main.js"></script>
+
+
+</body>
+</html>

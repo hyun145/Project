@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>아이디 찾기</title>
+    <meta charset="UTF-8">
+    <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="/images/icons/favicon.ico"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/material-design-iconic-font.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/hamburgers.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/animsition.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/select2.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/daterangepicker.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/util.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <!--===============================================================================================-->
+    <script src="/js/jquery-3.6.0.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+
+            $("#btnLogin").on("click", function () {
+                location.href = "/user/login";
+            })
+
+              $("#btnSearchUserId").on("click", function () {
+                  let f= document.getElementById("f");
+
+
+
+
+
+                  if(f.userName.value === "") {
+                      alert("이름을 입력하세요.");
+                      f.userName.focus()
+                      return;
+                  }
+
+                  if(f.email.value === "") {
+                      f.email.focus("이메일을 입력하세요.");
+                      return;
+                  }
+
+
+                  $.ajax({
+                      url: "/user/searchUserIdProc",
+                      method: "post",
+                      dataType: "JSON",
+                      data: $("#f").serialize(),
+                      success: function (json) {
+                          alert(json.msg);
+                      }
+                  })
+
+
+              })
+
+        })
+
+    </script>
+
+
+
+
+
+
+</head>
+<body>
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <form class="login100-form validate-form" id="f">
+					<span class="login100-form-title p-b-26">
+						GradeAdvisor
+					</span>
+
+
+                <div class="wrap-input100 validate-input"  data-validate = "이름을 입력하세요.">
+                    <input class="input100" type="text" name="userName" id="userName" placeholder="이름">
+                </div>
+
+
+
+
+                <div class="wrap-input100 validate-input"  data-validate = "닉네임을 입력하세요.">
+                    <input class="input100" type="text" name="email" id="email" placeholder="이메일">
+                </div>
+                <div class="wrap-login100-form-btn">
+                    <div class="login100-form-bgbtn"></div>
+                    <button class="login100-form-btn" id="btnSearchUserId" type="button">
+                        아이디 찾기
+                    </button>
+                </div>
+
+
+
+                <div class="container-login100-form-btn">
+                    <div class="wrap-login100-form-btn">
+                        <div class="login100-form-bgbtn"></div>
+                        <button class="login100-form-btn" id="btnLogin" type="button">
+                            로그인
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="dropDownSelect1"></div>
+
+<!--===============================================================================================-->
+<script src="/js/jquery-3.6.0.min.js"></script>
+<!--===============================================================================================-->
+<script src="/js/animsition.min.js"></script>
+<!--===============================================================================================-->
+<script src="/js/popper.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+<script src="/js/select2.min.js"></script>
+<!--===============================================================================================-->
+<script src="/js/moment.min.js"></script>
+<script src="/js/daterangepicker.js"></script>
+<!--===============================================================================================-->
+<script src="/js/countdowntime.js"></script>
+<!--===============================================================================================-->
+<script src="/js/main.js"></script>
+
+
+</body>
+</html>
