@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판 상세보기 - GradeAdvisor</title>
+    <!-- Bootstrap CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CSS -->
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <!-- Your custom styles -->
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Icons -->
+    <link href="/css/mainForm/style.css" rel="stylesheet">
+    <link href="/css/mainForm/boardInfo.css" rel="stylesheet">
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script src="/js/mainForm/main.js"></script>
+
+    <style>
+        #user-info-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #user-info {
+            margin-right: auto;
+        }
+
+        #post-date {
+            margin-left: auto;
+        }
+    </style>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const ssNickName = [[${session.SS_NICK_NAME}]];
+        const nickName = [[${rDTO.nickName}]];
+        const nSeq = [[${rDTO.noticeSeq}]];
+
+
+        $(document).ready(function () {
+
+            $("#btnEdit").on("click", function () {
+                doEdit();
+            })
+            $("#btnDelete").on("click", function () {
+                doDelete();
+            })
+            $("#btnList").on("click", function () {
+                location.href = "/bootStrap/mainBoard";
+            })
+        })
+
+        function doEdit() {
+            if (ssNickName === nickName) {
+                location.href = "/bootStrap/boardEditInfo?nSeq=" + nSeq;
+
+            } else if (session_user_id === "") {
+                alert("로그인 하시길 바랍니다.");
+
+            } else {
+                alert("본인이 작성한 글만 수정 가능합니다.");
+
+            }
+        }
+
+
+        function doDelete() {
+
+            if (confirm("작성한 글을 삭제하시곘습니까?")) {
+
+                $.ajax({
+                    url: "/bootStrap/boardDelete",
+                    type: "post",
+                    dataType: "JSON",
+                    data: {"nSeq": nSeq},
+                    success:
+                        function (json) {
+                            alert(json.msg);
+                            location.href = "/bootStrap/mainBoard?page=1";
+                        }
+                })
+            }
+
+        }
+
+        /*]]>*/
+    </script>
+</head>
+<body>
+<header id="header" class="header fixed-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+
+        <a href="index.html" class="logo d-flex align-items-center">
+            <img src="/images/img/logo.png" alt="">
+            <span>GradeAdvisor</span>
+        </a>
+
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a class="nav-link scrollto " href="#hero">Home</a></li>
+                <li><a class="nav-link scrollto" href="#team">Team</a></li>
+                <li><a class="active" href="/bootStrap/mainBoard?page=1">게시판</a></li>
+                <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
+                    <ul>
+                        <li><a href="#">Drop Down 1</a></li>
+                        <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
+                            <ul>
+                                <li><a href="#">Deep Drop Down 1</a></li>
+                                <li><a href="#">Deep Drop Down 2</a></li>
+                                <li><a href="#">Deep Drop Down 3</a></li>
+                                <li><a href="#">Deep Drop Down 4</a></li>
+                                <li><a href="#">Deep Drop Down 5</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">Drop Down 2</a></li>
+                        <li><a href="#">Drop Down 3</a></li>
+                        <li><a href="#">Drop Down 4</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown megamenu"><a href="#"><span>Mega Menu</span> <i class="bi bi-chevron-down"></i></a>
+                    <ul>
+                        <li>
+                            <a href="#">Column 1 link 1</a>
+                            <a href="#">Column 1 link 2</a>
+                            <a href="#">Column 1 link 3</a>
+                        </li>
+                        <li>
+                            <a href="#">Column 2 link 1</a>
+                            <a href="#">Column 2 link 2</a>
+                            <a href="#">Column 3 link 3</a>
+                        </li>
+                        <li>
+                            <a href="#">Column 3 link 1</a>
+                            <a href="#">Column 3 link 2</a>
+                            <a href="#">Column 3 link 3</a>
+                        </li>
+                        <li>
+                            <a href="#">Column 4 link 1</a>
+                            <a href="#">Column 4 link 2</a>
+                            <a href="#">Column 4 link 3</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li><a class="getstarted scrollto" href="/user/login">로그인</a></li>
+            </ul>
+            <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
+
+    </div>
+</header><!-- End Header -->
+
+<main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section class="breadcrumbs">
+        <div class="container">
+
+            <ol>
+                <li><a href="index.html">메인</a></li>
+                <li><a href="/bootStrap/mainBoard?page=1">게시판</a></li>
+                <li>게시판 상세보기</li>
+            </ol>
+            <h2>게시판 상세보기</h2>
+
+        </div>
+    </section>
+</main>
+<section itemscope itemtype="http://schema.org/Article">
+    <h1 itemprop="headline" th:text="${rDTO.title()}"></h1>
+    <div class="panel panel-default view-head">
+        <div class="panel-heading">
+            <div class="ellipsis text-muted font-12">
+                <span itemprop="pulishel" th:text="${rDTO.nickName()}"></span>
+                <span class="sp"></span>
+                <i class="fa fa-comment">댓글 아이콘</i>
+                <b class="red">댓글수</b>
+                <span class="sp"></span>
+                <!--                <i class="fa fa-eye" th:text="${rDTO.readCnt()}"></i>-->
+                <span class="pull-right">
+                    <span itemprop="datePublished" th:text="${rDTO.regDt()}"></span>
+
+                </span>
+
+            </div>
+        </div>
+        <div class="view-padding">
+            <div itemprop="description" class="view-content">
+                <div th:text="${rDTO.contents()}"></div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div th:if = "${nickNameCheck}">
+        <!-- 수정 버튼 -->
+        <!--        <a th:href="@{/post/edit/{postId}(postId=${post.id})}">수정</a>-->
+        <button id="btnEdit" type="button">수정</button>
+        <button id="btnDelete" type="button">삭제</button>
+    </div>
+
+</section>
+
+
+<!-- 댓글 입력 폼 -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="mb-3">
+                <label for="commentInput" class="form-label">댓글 작성</label>
+                <textarea class="form-control" id="commentInput" name="commentInput" rows="3"></textarea>
+            </div>
+            <button type="button" id="btnSendComment" class="btn btn-primary">댓글 작성</button>
+        </div>
+    </div>
+</div>
+</body>
+
+
+<footer id="footer" class="footer">
+    <!-- Footer 내용 추가 -->
+</footer><!-- End Footer -->
+
+
+</body>
+</html>
