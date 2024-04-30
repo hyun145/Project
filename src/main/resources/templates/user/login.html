@@ -49,9 +49,9 @@
 			$("#btnLogin").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
 				let f = document.getElementById("f"); // form 태그
 
-				if (f.user_id.value === "") {
+				if (f.userId.value === "") {
 					alert("아이디를 입력하세요.");
-					f.user_id.focus();
+					f.userId.focus();
 					return;
 				}
 
@@ -70,12 +70,11 @@
 							success: function (json) { // /notice/noticeUpdate 호출이 성공했다면..
 
 								if (json.result === 1) { // 로그인 성공
-									alert(json.msg); // 메시지 띄우기
-									location.href = "/user/loginSuccess"; // 로그인 성공 페이지 이동
+									location.href = "/bootStrap/mainBoard?page=1"; // 로그인 성공 페이지 이동
 
 								} else { // 로그인 실패
 									alert(json.msg); // 메시지 띄우기
-									$("#user_id").focus(); // 아이디 입력 항목에 마우스 커서 이동
+									$("#userId").focus(); // 아이디 입력 항목에 마우스 커서 이동
 								}
 
 							}
@@ -97,7 +96,7 @@
 
 </head>
 <body>
-<form id="f">
+<form id="f" name="f">
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">
@@ -108,7 +107,7 @@
 					
 
 					<div class="wrap-input100 validate-input"  data-validate = "아이디를 입력하세요.">
-						<input class="input100" type="text" name="user_id" id="user_id" placeholder="아이디">
+						<input class="input100" type="text" name="userId" id="userId" placeholder="아이디">
 					</div>
 
 
@@ -134,12 +133,19 @@
 					</div>
 
 					<div class="text-center p-t-115">
-                        <a href="userRegForm">회원가입
-                            <a> | </a>
-                        <a href="searchUserIdPassword">아이디/비밀번호 찾기</a>
-                        </a>
-
+						<a href="/user/userRegForm">
+							<i class="bi bi-person"></i> 회원가입
+						</a>
+						<span class="mx-2">|</span>
+						<a href="/user/searchUserId">
+							<i class="bi bi-person-check"></i> 아이디 찾기
+						</a>
+						<span class="mx-2">|</span>
+						<a href="/user/searchPassword">
+							<i class="bi bi-lock"></i> 비밀번호 찾기
+						</a>
 					</div>
+
 				</form>
 			</div>
 		</div>

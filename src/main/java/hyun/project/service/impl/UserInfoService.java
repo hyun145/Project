@@ -132,12 +132,13 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
-    public int getUserLogin(UserInfoDTO pDTO) throws Exception {
+    public UserInfoDTO getUserLogin(UserInfoDTO pDTO) throws Exception {
 
         log.info(this.getClass().getName() +".getUserLogin Start!");
 
         int res = 0;
 
+        UserInfoDTO rDTO;
         String userId = CmmUtil.nvl(pDTO.userId());
 
         String password =  CmmUtil.nvl(pDTO.password());
@@ -146,14 +147,18 @@ public class UserInfoService implements IUserInfoService {
         log.info("password : " + password);
 
         Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserIdAndPassword(userId, password);
+        UserInfoEntity pEntity = rEntity.get();
 
         if(rEntity.isPresent()) {
-            res = 1;
+            rDTO =  new ObjectMapper().convertValue(pEntity, UserInfoDTO.class);
 
+
+        } else {
+            rDTO = UserInfoDTO.builder().build();
         }
 
         log.info(this.getClass().getName() +".getUserLogin End!");
-        return res;
+        return rDTO;
     }
 
     @Override

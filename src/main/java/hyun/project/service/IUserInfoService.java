@@ -8,7 +8,7 @@ public interface IUserInfoService {
 
     int insertUserInfo(UserInfoDTO pDTO) throws Exception;
 
-    int getUserLogin(UserInfoDTO pDTO) throws Exception;
+    UserInfoDTO getUserLogin(UserInfoDTO pDTO) throws Exception;
 
     UserInfoDTO  getEmailExists(UserInfoDTO pDTO) throws Exception;
 

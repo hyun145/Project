@@ -9,8 +9,6 @@ public record NoticeDTO(
 
         String title,
 
-        String noticeYn,
-
         String contents,
 
         String userId,
@@ -25,7 +23,9 @@ public record NoticeDTO(
 
         String chgDt,
 
-        String userName
+        String userName,
+
+        String nickName
 
 
 

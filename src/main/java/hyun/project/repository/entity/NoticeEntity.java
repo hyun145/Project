@@ -19,7 +19,7 @@ import org.hibernate.annotations.DynamicUpdate;
 public class NoticeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동으로 값을 증가시킴.
     @Column(name = "notice_seq")
     private Long noticeSeq;
 
@@ -28,16 +28,17 @@ public class NoticeEntity {
     private String title;
 
     @NonNull
-    @Column(name = "notice_yn", length = 1, nullable = false)
-    private String noticeYn;
-
-    @NonNull
     @Column(name = "contents", nullable = false)
     private String contents;
 
     @NonNull
     @Column(name = "user_id", nullable = false)
     private String userId;
+
+    @NonNull
+    @Column(name = "nick_name", nullable = false)
+    private String nickName;
+
 
     @Column(name = "read_cnt", nullable = false)
     private Long readCnt;

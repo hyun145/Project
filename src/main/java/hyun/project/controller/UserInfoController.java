@@ -142,32 +142,44 @@ public class UserInfoController {
     @PostMapping (value = "loginProc")
     public MsgDTO loginProc(HttpServletRequest request, HttpSession session) throws Exception {
         log.info(this.getClass().getName() +".loginProc Start!");
-        String msg;
-        String user_id = CmmUtil.nvl(request.getParameter("user_id"));
+        int res = 0;
+        String msg = "";
+        MsgDTO dto = null;
+
+        try {
+
+        String userId = CmmUtil.nvl(request.getParameter("userId"));
         String password = CmmUtil.nvl(request.getParameter("password"));
 
-        log.info("user_id : " + user_id);
+        log.info("userId : " + userId);
         log.info("password : " + password);
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
-                .userId(user_id)
+                .userId(userId)
                 .password(EncryptUtil.encHashSHA256(password))
                 .build();
 
-        int res = userInfoService.getUserLogin(pDTO);
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserLogin(pDTO))
+                .orElseGet(() -> UserInfoDTO.builder().build());
 
-        log.info("res : " + res);
+            if (CmmUtil.nvl(rDTO.userId()).length() > 0) {
+                res = 1;
 
-        if (res ==1) {
-            msg = "로그인이 성공했습니다.";
-            session.setAttribute("SS_USER_ID",  user_id);
-        } else {
-            msg = "아이디와 비밀번호가 올바르지 않습니다.";
+                session.setAttribute("SS_NICK_NAME", CmmUtil.nvl(rDTO.nickName()));
+                session.setAttribute("SS_USER_ID", CmmUtil.nvl(rDTO.userId()));
+
+                log.info("일로 잘 들어옴.");
+            }
+        } catch (Exception e) {
+            log.info("catch로 들어옴. ");
+            msg = "아이디와 비밀번호가 일치하지 않습니다.";
+            res = 2;
+            log.info(e.toString());
+            e.printStackTrace();
+        } finally {
+            dto = MsgDTO.builder().msg(msg).result(res).build();
+            log.info(this.getClass().getName() +".loginProc End!");
         }
-        MsgDTO dto = MsgDTO.builder()
-                .result(res).msg(msg).build();
-        log.info(this.getClass().getName() +".loginProc End!");
-
         return dto;
     }
 

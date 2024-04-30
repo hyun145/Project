@@ -50,9 +50,9 @@ public class NoticeController {
         log.info(this.getClass().getName() + ".noticeList Start!");
 
         // 로그인된 사용자 아이디는 Session에 저장함
-        // 교육용으로 아직 로그인을 구현하지 않았기 때문에 Session에 데이터를 저장하지 않았음
-        // 추후 로그인을 구현할 것으로 가정하고, 공지사항 리스트 출력하는 함수에서 로그인 한 것처럼 Session 값을 생성함
-        session.setAttribute("SESSION_USER_ID", "USER01");
+        String ssUserId = (String) session.getAttribute("SS_USER_ID");
+
+        log.info("세션에 저장되있는 사용자 닉네임: " +ssUserId);
 
         // 공지사항 리스트 조회하기
         // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
@@ -111,7 +111,6 @@ public class NoticeController {
             // 로그인을 아직 구현하지 않았기에 공지사항 리스트에서 로그인 한 것처럼 Session 값을 저장함
             String userId = CmmUtil.nvl((String) session.getAttribute("SESSION_USER_ID"));
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
-            String noticeYn = CmmUtil.nvl(request.getParameter("noticeYn")); // 공지글 여부
             String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
 
             /*
@@ -121,12 +120,11 @@ public class NoticeController {
              */
             log.info("session user_id : " + userId);
             log.info("title : " + title);
-            log.info("noticeYn : " + noticeYn);
             log.info("contents : " + contents);
 
             // 데이터 저장하기 위해 DTO에 저장하기
             NoticeDTO pDTO = NoticeDTO.builder().userId(userId).title(title)
-                    .noticeYn(noticeYn).contents(contents).build();
+                  .contents(contents).build();
 
             /*
              * 게시글 등록하기위한 비즈니스 로직을 호출
@@ -239,7 +237,6 @@ public class NoticeController {
             String userId = CmmUtil.nvl((String) session.getAttribute("SESSION_USER_ID")); // 아이디
             String nSeq = CmmUtil.nvl(request.getParameter("nSeq")); // 글번호(PK)
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
-            String noticeYn = CmmUtil.nvl(request.getParameter("noticeYn")); // 공지글 여부
             String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
 
             /*
@@ -250,14 +247,13 @@ public class NoticeController {
             log.info("userId : " + userId);
             log.info("nSeq : " + nSeq);
             log.info("title : " + title);
-            log.info("noticeYn : " + noticeYn);
             log.info("contents : " + contents);
 
             /*
              * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
              */
             NoticeDTO pDTO = NoticeDTO.builder().userId(userId).noticeSeq(Long.parseLong(nSeq))
-                    .title(title).noticeYn(noticeYn).contents(contents).build();
+                    .title(title).contents(contents).build();
 
             // 게시글 수정하기 DB
             noticeService.updateNoticeInfo(pDTO);

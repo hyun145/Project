@@ -1,6 +1,7 @@
 package hyun.project.service;
 
 import hyun.project.dto.NoticeDTO;
+
 import java.util.List;
 
 
@@ -18,6 +19,7 @@ public interface INoticeService {
 
     void insertNoticeInfo(NoticeDTO pDTO) throws Exception;     // 저장
 
+    List<NoticeDTO> boardSearchList(NoticeDTO pDTO) throws Exception;
 
 
 
