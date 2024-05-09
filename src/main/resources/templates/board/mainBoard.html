@@ -29,19 +29,30 @@
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
         function doDetail(seq) {
-            location.href = "/bootStrap/boardInfo?nSeq=" + seq;
+            location.href = "/board/boardInfo?nSeq=" + seq;
         }
 
         $(document).ready(function () {
             $("#btnSearch").on("click", function () {
                let f = document.getElementById("f");
 
-
                if (f.keyword.value === "") {
                    alert("검색어를 입력해주세요.");
                    f.keyword.focus();
                    return;
                }
+             /*   $.ajax({
+                    url: "/board/boardDelete",
+                    type: "post",
+                    dataType: "JSON",
+                    data: {"nSeq": nSeq},
+                    success:
+                        function (json) {
+                            alert(json.msg);
+                            location.href = "/board/mainBoard?page=1";
+                        }
+                })*/
+
             })
 
         })
@@ -49,8 +60,6 @@
 
 
     </script>
-
-
 
 
 </head>
@@ -71,7 +80,7 @@
             <ul>
                 <li><a class="nav-link scrollto " href="#hero">Home</a></li>
                 <li><a class="nav-link scrollto" href="#team">Team</a></li>
-                <li><a class="active" href="/bootStrap/mainBoard">게시판</a></li>
+                <li><a class="active" href="/board/mainBoard">게시판</a></li>
                 <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
                     <ul>
                         <li><a href="#">Drop Down 1</a></li>
@@ -157,14 +166,14 @@
                     </form>
                 </div>-->
                 <div class="footer-newsletter">
-                    <form class="form-wrapper cf" id="f" action="/bootStrap/searchBoard">
+                    <form class="form-wrapper cf" id="f" action="/board/searchBoard" method="get">
                         <input type="text" id="keyword" name="keyword">
                         <button type="submit" id="btnSearch" >검색</button>
                     </form>
                 </div>
 
                 <div th:if = "${nickNameCheck}">
-                        <a href="/bootStrap/boardReg" class="btn">글쓰기</a>
+                        <a href="/board/boardReg" class="btn">글쓰기</a>
                         <a href="#" class="btn">마이페이지</a>
                 </div>
 
@@ -174,7 +183,6 @@
                     <table class="board-table" id="listTable">
                         <thead>
                         <tr>
-                            <th scope="col" class="th-num">번호</th>
                             <th scope="col" class="th-title">제목</th>
                             <th scope="col" class="th-nickName">닉네임</th>
                             <th scope="col" class="th-date">등록일</th>
@@ -182,9 +190,8 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr class="text-center" th:each="dto, stat : ${rList}">
-                            <td th:text="__${stat.index + 1}__"></td>
-                            <td th:text="${dto.title}" th:onclick="doDetail([[${dto.noticeSeq}]])"></td>
+                        <tr class="text-center" th:each="dto : ${rList}">
+                            <td th:text="${dto.title}" th:onclick="doDetail([[${dto.boardSeq}]])"></td>
                             <td th:text="${dto.nickName}"></td>
                             <td th:text="${dto.regDt}"></td>
                             <td th:text="${dto.readCnt}"></td>
@@ -198,28 +205,28 @@
                 <div class="pagination">
                     <ul class="pagination pagination-primary" id="pagination">
                         <li class="page-item">
-                            <a class="page-link" th:href="@{/bootStrap/mainBoard?page=1}">&laquo;</a>
+                            <a class="page-link" th:href="@{/board/mainBoard?page=1}">&laquo;</a>
                         </li>
                         <!-- 이전 페이지로 이동하는 링크 -->
                         <li class="page-item" th:if="${currentPage > 1}">
                             <a class="page-link"
-                               th:href="@{/bootStrap/mainBoard(page=${currentPage - 1})}">&lt;</a>
+                               th:href="@{/board/mainBoard(page=${currentPage - 1})}">&lt;</a>
                         </li>
                         <!-- 현재 페이지 주변에 페이지 번호 링크 표시 -->
                         <th:block th:each="pageNumber : ${#numbers.sequence(T(java.lang.Math).max(1, currentPage - 5), T(java.lang.Math).min(totalPages, currentPage + 5))}">
                             <li class="page-item"
                                 th:class="${pageNumber == currentPage ? 'active' : ''}">
-                                <a class="page-link" th:href="@{/bootStrap/mainBoard(page=${pageNumber})}"
+                                <a class="page-link" th:href="@{/board/mainBoard(page=${pageNumber})}"
                                    th:text="${pageNumber}"></a>
                             </li>
                         </th:block>
                         <!-- 다음 페이지로 이동하는 링크 -->
                         <li class="page-item" th:if="${currentPage < totalPages}">
                             <a class="page-link"
-                               th:href="@{/bootStrap/mainBoard(page=${currentPage + 1})}">&gt;</a>
+                               th:href="@{/board/mainBoard(page=${currentPage + 1})}">&gt;</a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" th:href="@{/bootStrap/mainBoard(page=${totalPages})}">&raquo;</a>
+                            <a class="page-link" th:href="@{/board/mainBoard(page=${totalPages})}">&raquo;</a>
                         </li>
                     </ul>
                 </div>

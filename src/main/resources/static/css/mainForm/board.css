@@ -78,7 +78,8 @@ section.notice {
 }
 /* 제목 */
 .board-table .th-title {
-    width: 40%;
+    width: 15%;
+
 }
 
 /* 닉네임 */

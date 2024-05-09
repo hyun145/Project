@@ -3,7 +3,7 @@ package hyun.project.controller;
 
 import hyun.project.dto.MsgDTO;
 import hyun.project.dto.UserInfoDTO;
-import hyun.project.service.impl.UserInfoService;
+import hyun.project.service.IUserInfoService;
 import hyun.project.util.CmmUtil;
 import hyun.project.util.EncryptUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +25,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserInfoController {
 
-    private final UserInfoService userInfoService;
+    private final IUserInfoService userInfoService;
 
 
     @GetMapping(value = "userRegForm")

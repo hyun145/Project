@@ -3,10 +3,10 @@ package hyun.project.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hyun.project.dto.NoticeDTO;
-import hyun.project.repository.NoticeRepository;
-import hyun.project.repository.entity.NoticeEntity;
-import hyun.project.service.INoticeService;
+import hyun.project.dto.BoardDTO;
+import hyun.project.repository.BoardRepository;
+import hyun.project.repository.entity.BoardEntity;
+import hyun.project.service.IBoardService;
 import hyun.project.util.CmmUtil;
 import hyun.project.util.DateUtil;
 import lombok.RequiredArgsConstructor;
@@ -19,112 +19,116 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class NoticeService implements INoticeService {
+public class BoardService implements IBoardService {
 
     // RequiredArgsConstructor 어노테이션으로 생성자를 자동 생성함
     // noticeRepository 변수에 이미 메모리에 올라간 NoticeRepository 객체를 넣어줌
     // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
-    private final NoticeRepository noticeRepository;
+    private final BoardRepository boardRepository;
 
     @Override
-    public List<NoticeDTO> getNoticeList() {
+    public List<BoardDTO> getBoardList() {
 
-        log.info(this.getClass().getName() + ".getNoticeList Start!");
+        log.info(this.getClass().getName() + ".getBoardList Start!");
 
         // 공지사항 전체 리스트 조회하기
-        List<NoticeEntity> rList = noticeRepository.findAllByOrderByNoticeSeqDesc();
+        List<BoardEntity> rList = boardRepository.findAllByOrderByBoardSeqDesc();
 
         // 엔티티의 값들을 DTO에 맞게 넣어주기
-        List<NoticeDTO> nList = new ObjectMapper().convertValue(rList,
+        List<BoardDTO> nList = new ObjectMapper().convertValue(rList,
                 new TypeReference<>() {
                 });
 
-        log.info(this.getClass().getName() + ".getNoticeList End!");
+
+
+        log.info(this.getClass().getName() + ".getBoardList End!");
 
         return nList;
     }
 
     @Transactional
     @Override
-    public NoticeDTO getNoticeInfo(NoticeDTO pDTO, boolean type) {
+    public BoardDTO getBoardInfo(BoardDTO pDTO, boolean type) {
 
-        log.info(this.getClass().getName() + ".getNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".getBoardInfo Start!");
 
         if (type) {     // 상세 화면만 조회수 증가하고, 수정 화면은 조회수 증가 안함.
             // 조회수 증가하기
-            int res = noticeRepository.updateReadCnt(pDTO.noticeSeq());
+            int res = boardRepository.updateReadCnt(pDTO.boardSeq());
 
             // 조회수 증가 성공여부 체크
             log.info("res : " + res);
         }
 
         // 공지사항 상세내역 가져오기
-        NoticeEntity rEntity = noticeRepository.findByNoticeSeq(pDTO.noticeSeq());
+        BoardEntity rEntity = boardRepository.findByBoardSeq(pDTO.boardSeq());
 
         // 엔티티의 값들을 DTO에 맞게 넣어주기
-        NoticeDTO rDTO = new ObjectMapper().convertValue(rEntity, NoticeDTO.class);  // DTO 변환하기.
+        BoardDTO rDTO = new ObjectMapper().convertValue(rEntity, BoardDTO.class);  // DTO 변환하기.
 
-        log.info(this.getClass().getName() + ".getNoticeInfo End!");
+        log.info(this.getClass().getName() + ".getBoardInfo End!");
 
         return rDTO;
     }
 
     @Transactional
     @Override
-    public void updateNoticeInfo(NoticeDTO pDTO) {
+    public int updateBoardInfo(BoardDTO pDTO) {
 
-        log.info(this.getClass().getName() + ".updateNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".updateBoardInfo Start!");
 
-        Long noticeSeq = pDTO.noticeSeq();
+        Long boardSeq = pDTO.boardSeq();
 
         String title = CmmUtil.nvl(pDTO.title());
         String contents = CmmUtil.nvl(pDTO.contents());
         String userId = CmmUtil.nvl(pDTO.userId());
         String nickName = CmmUtil.nvl(pDTO.nickName());
 
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("boardSeq : " + boardSeq);
         log.info("title : " + title);
         log.info("contents : " + contents);
         log.info("userId : " + userId);
         log.info("nickName : " + nickName);
 
         // 현재 공지사항 조회수 가져오기
-        NoticeEntity rEntity = noticeRepository.findByNoticeSeq(noticeSeq);
+        BoardEntity rEntity = boardRepository.findByBoardSeq(boardSeq);
 
         // 수정할 값들을 빌더를 통해 엔티티에 저장하기
-        NoticeEntity pEntity = NoticeEntity.builder()
-                .noticeSeq(noticeSeq).title(title).contents(contents).userId(userId)
+        BoardEntity pEntity = BoardEntity.builder()
+                .boardSeq(boardSeq).title(title).contents(contents).userId(userId)
                 .nickName(nickName)
                 .readCnt(rEntity.getReadCnt())
                 .build();
 
         // 데이터 수정하기
-        noticeRepository.save(pEntity);
+        boardRepository.save(pEntity);
 
-        log.info(this.getClass().getName() + ".updateNoticeInfo End!");
+        log.info(this.getClass().getName() + ".updateBoardInfo End!");
+
+        return 1;
 
     }
 
     @Override
-    public void deleteNoticeInfo(NoticeDTO pDTO)  {
+    public void deleteBoardInfo(BoardDTO pDTO)  {
 
-        log.info(this.getClass().getName() + ".deleteNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".deleteBoardInfo Start!");
 
-        Long noticeSeq = pDTO.noticeSeq();
+        Long boardSeq = pDTO.boardSeq();
 
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("boardSeq : " + boardSeq);
 
         // 데이터 수정하기
-        noticeRepository.deleteById(noticeSeq);
+        boardRepository.deleteById(boardSeq);
 
 
-        log.info(this.getClass().getName() + ".deleteNoticeInfo End!");
+        log.info(this.getClass().getName() + ".deleteBoardInfo End!");
     }
 
     @Override
-    public void insertNoticeInfo(NoticeDTO pDTO) throws Exception {
+    public Long insertBoardInfo(BoardDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".InsertNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".InsertBoardInfo Start!");
 
         String title = CmmUtil.nvl(pDTO.title());
         String contents = CmmUtil.nvl(pDTO.contents());
@@ -137,31 +141,32 @@ public class NoticeService implements INoticeService {
 
         // 공지사항 저장을 위해서는 PK 값은 빌더에 추가하지 않는다.
         // JPA에 자동 증가 설정을 해놨음
-        NoticeEntity pEntity = NoticeEntity.builder()
+        BoardEntity pEntity = BoardEntity.builder()
                 .title(title).contents(contents).nickName(nickName).readCnt(0L)
                 .regId(nickName).regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                 .chgId(nickName).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                 .userId(userId).build();
 
         // 공지사항 저장하기
-        noticeRepository.save(pEntity);
+        boardRepository.save(pEntity);
 
-        log.info(this.getClass().getName() + ".InsertNoticeInfo End!");
+        log.info(this.getClass().getName() + ".InsertBoardInfo End!");
+        return pEntity.getBoardSeq();
 
     }
 
     @Override
-    public List<NoticeDTO> boardSearchList(NoticeDTO pDTO) throws Exception {
+    public List<BoardDTO> boardSearchList(BoardDTO pDTO) throws Exception {
 
         log.info(this.getClass().getName() +".boardSearchList Start!");
         String keyWord = CmmUtil.nvl(pDTO.title());
 
 
-        List<NoticeEntity> rEntity = noticeRepository.findByTitleContaining(keyWord);
+        List<BoardEntity> rEntity = boardRepository.findByTitleContaining(keyWord);
 
 
         // 엔티티의 값들을 DTO에 맞게 넣어주기
-        List<NoticeDTO> nList = new ObjectMapper().convertValue(rEntity,
+        List<BoardDTO> nList = new ObjectMapper().convertValue(rEntity,
                 new TypeReference<>() {
                 });
 

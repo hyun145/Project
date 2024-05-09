@@ -9,19 +9,19 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "NOTICE")
+@Table(name = "BOARD")
 @DynamicInsert
 @DynamicUpdate
 @Builder
 @Entity
 @ToString
 @Cacheable
-public class NoticeEntity {
+public class BoardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동으로 값을 증가시킴.
-    @Column(name = "notice_seq")
-    private Long noticeSeq;
+    @Column(name = "board_seq")
+    private Long boardSeq;
 
     @NonNull
     @Column(name = "title", length = 500, nullable = false)
@@ -54,5 +54,8 @@ public class NoticeEntity {
 
     @Column(name = "chg_dt")
     private String chgDt;
+
+    @Column(name = "FILE_YN")
+    private String fileYn;
 
 }

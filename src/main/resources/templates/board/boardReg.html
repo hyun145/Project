@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시판 수정하기- GradeAdvisor</title>
+    <title>글쓰기 - GradeAdvisor</title>
     <!-- Bootstrap CSS -->
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CSS -->
@@ -15,15 +15,110 @@
     <!-- Bootstrap Icons -->
     <link href="/css/mainForm/style.css" rel="stylesheet">
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript">
+    <script th:inline="javascript">
 
-
+        let arr = [];
         $(document).ready(function () {
 
-            $("#btnEdit").on("click", function () {
+            let userId = /*[[${ssUserId}]]*/ '';
+
+            if (userId === 0) {
+                alert("로그인 후 이용 가능한 서비스입니다.");
+                location.href = "/user/login";
+            }
+
+
+            $("#btnList").on("click", function () {
+                location.href = "mainBoard";
+            })
+            $("#btnSend").on("click", function () {
                 doSubmit();
             })
+
+            $("input[type='file']").change(function (e) {
+                let files = e.target.files;
+
+
+                for (let i = 0; i < files.length; i++) {
+                    if (!checkExtension(files[i].name, files[i].size)) {
+                        return false;
+                    }
+                }
+
+
+
+                preview(Array.from(files));
+            }); // file Change
         })
+
+        function checkExtension(fileName, fileSize) {
+            let regex = new RegExp("(.*?)\.(exe|sh|zip|alz)$");
+            let maxSize = 20971520; // 20MB
+
+            if (fileSize >= maxSize) {
+                alert("파일 사이즈 초과");
+                $("input[type='file']").val("");
+                return false;
+            }
+
+            if (regex.test(fileName)) {
+                alert("사진만 첨부해주시기 바랍니다.");
+                $("input[type='file']").val("");
+                return false;
+            }
+            return true;
+
+        }
+
+        function preview(files) {
+              files.forEach(function (f) {
+                let fileName = f.name;
+                if (fileName.length > 10) {
+                    fileName = fileName.substring(0, 4) + "...";
+                }
+
+                let str = '<div style="display: inline-flex; padding: 10px;"><li>';
+                str += '<span>' + fileName + '</span>&nbsp';
+
+
+                if (files[0].type.match('image.*')) {
+
+                    console.log(arr.indexOf(files))
+                    if (arr.indexOf(files) == -1) { // 이미지 배열에 존재하지 않으면 추가
+                        arr.push(files); // 이미지를 배열에 추가
+                        console.log(arr)
+
+                    }
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        str += '<button type="button" class="btn btn-danger btn-sm delBtn" style="margin-bottom: 2px;" onclick="removeImage(this)" value="' + f.name + '">x</button><br>';
+                        str += '<img src="' + e.target.result + '" title="' + f.name + '" width=100 height=100 />';
+                        str += '</li></div>';
+                        $(str).appendTo('#preview');
+                    }
+                    reader.readAsDataURL(f);
+                } else {
+                    str += '<button type="button" class="btn btn-danger btn-sm delBtn" style="margin-bottom: 2px;" onclick="removeImage(this)" value="' + f.name + '">x</button><br>';
+                    str += '<img src="/resources/img/fileImg.png" title="' + f.name + '" width=100 height=100 />';
+                    str += '</li></div>';
+                    $(str).appendTo('#preview');
+                }
+              });
+            console.log(arr);
+        }
+
+        function removeImage(button) {  // X클릭시 발생하는 함수
+            let fileName = $(button).val();
+
+            arr = arr.filter(function (file) {
+                return file.name !== fileName;
+            });
+
+            console.log(arr);
+            $(button).closest('div').remove();
+        }
+
+
 
         function calBytes(str) {
             let tcount = 0;
@@ -40,6 +135,7 @@
             }
             return tcount;
         }
+
         function doSubmit() {
             let f = document.getElementById("f"); // 폼 요소 가져오기
 
@@ -74,18 +170,34 @@
                 return;
             }
 
+            let formData = new FormData();
+            formData.append('title', f.title.value);
+            formData.append('contents', f.contents.value);
+            for (let i = 0; i < arr.length; i++) {    // 이미지 파일들을 formData에 추가.
+                formData.append('file', arr[i][0]);
+            }
+
+
             $.ajax({
-                url: "/bootStrap/boardUpdate",
+                url: "/board/boardInsert",
                 type: "post",
                 dataType: "JSON",
-                data: $("#f").serialize(),
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function (json) {
                     alert(json.msg);
-                    location.href = "/bootStrap/mainBoard?page=1";
+                    if (json.result === 1) {
+                        location.href = "/board/mainBoard";
+
+                    } else {
+                        alert("시스템 문제로 게시글 작성에 실패하였습니다.");
+                    }
                 }
             });
         }
     </script>
+
 
 </head>
 
@@ -102,7 +214,7 @@
             <ul>
                 <li><a class="nav-link scrollto " href="#hero">Home</a></li>
                 <li><a class="nav-link scrollto" href="#team">Team</a></li>
-                <li><a class="active" href="/bootStrap/mainBoard">게시판</a></li>
+                <li><a class="active" href="/board/mainBoard?page=1">게시판</a></li>
                 <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
                     <ul>
                         <li><a href="#">Drop Down 1</a></li>
@@ -162,7 +274,7 @@
 
             <ol>
                 <li><a href="index.html">메인</a></li>
-                <li><a href="/bootStrap/mainBoard">게시판</a></li>
+                <li><a href="/board/mainBoard">게시판</a></li>
                 <li>글 작성</li>
             </ol>
             <h2>글 작성</h2>
@@ -182,17 +294,25 @@
             </div>
             <div class="row">
                 <div class="col-lg-12">
-                    <form action="/post" method="post" id="f" name="f">
+                    <form id="f" name="f" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <input type="hidden" name="nSeq" th:value="${rDTO.noticeSeq}"/>
                             <label for="title" class="form-label">제목</label>
-                            <input type="text" class="form-control" th:value="${rDTO.title}" id="title" required>
+                            <input type="text" class="form-control" style="width: 25%" id="title" name="title" required>
                         </div>
                         <div class="mb-3">
                             <label for="contents" class="form-label">내용</label>
-                            <textarea class="form-control" th:text="${rDTO.contents()}" name="contents" rows="5" id="contents" required></textarea>
+                            <textarea class="form-control" id="contents" style="width: 70%" name="contents" rows="14"
+                                      required></textarea>
                         </div>
-                        <button id="btnEdit" type="button">수정</button>
+                        <div class="card-body">
+                            <input class="form-control" type="file" id="file" multiple name="file"
+                                   accept=".jpeg, .jpg, .gif, .png">
+                            <div id="preview"></div>
+                        </div>
+                        <button type="button" id="btnSend" class="btn btn-primary">등록</button>
+                        <button type="reset" class="btn btn-primary">재작성</button>
+                        <button id="btnList" type="button" class="btn btn-primary">목록</button>
+
                     </form>
                 </div>
             </div>
@@ -201,7 +321,13 @@
 
 
 </main>
-
+<script src="/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="/vendor/aos/aos.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="/vendor/php-email-form/validate.js"></script>
 <script src="/js/mainForm/main.js"></script>
 
 </body>

@@ -4,8 +4,8 @@ package hyun.project.dto;
 import lombok.Builder;
 
 @Builder
-public record NoticeDTO(
-        Long noticeSeq,
+public record BoardDTO(
+        Long boardSeq,
 
         String title,
 
@@ -25,7 +25,9 @@ public record NoticeDTO(
 
         String userName,
 
-        String nickName
+        String nickName,
+
+        String fileYn
 
 
 

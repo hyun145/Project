@@ -15,7 +15,6 @@
     <link href="/css/mainForm/style.css" rel="stylesheet">
     <link href="/css/mainForm/boardInfo.css" rel="stylesheet">
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-    <script src="/js/mainForm/main.js"></script>
 
     <style>
         #user-info-container {
@@ -35,7 +34,7 @@
         /*<![CDATA[*/
         const ssNickName = [[${session.SS_NICK_NAME}]];
         const nickName = [[${rDTO.nickName}]];
-        const nSeq = [[${rDTO.noticeSeq}]];
+        const nSeq = [[${rDTO.boardSeq}]];
 
 
         $(document).ready(function () {
@@ -47,13 +46,13 @@
                 doDelete();
             })
             $("#btnList").on("click", function () {
-                location.href = "/bootStrap/mainBoard";
+                location.href = "/board/mainBoard";
             })
         })
 
         function doEdit() {
             if (ssNickName === nickName) {
-                location.href = "/bootStrap/boardEditInfo?nSeq=" + nSeq;
+                location.href = "/board/boardEditInfo?nSeq=" + nSeq;
 
             } else if (session_user_id === "") {
                 alert("로그인 하시길 바랍니다.");
@@ -70,14 +69,14 @@
             if (confirm("작성한 글을 삭제하시곘습니까?")) {
 
                 $.ajax({
-                    url: "/bootStrap/boardDelete",
+                    url: "/board/boardDelete",
                     type: "post",
                     dataType: "JSON",
                     data: {"nSeq": nSeq},
                     success:
                         function (json) {
                             alert(json.msg);
-                            location.href = "/bootStrap/mainBoard?page=1";
+                            location.href = "/board/mainBoard?page=1";
                         }
                 })
             }
@@ -100,7 +99,7 @@
             <ul>
                 <li><a class="nav-link scrollto " href="#hero">Home</a></li>
                 <li><a class="nav-link scrollto" href="#team">Team</a></li>
-                <li><a class="active" href="/bootStrap/mainBoard?page=1">게시판</a></li>
+                <li><a class="active" href="/board/mainBoard?page=1">게시판</a></li>
                 <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
                     <ul>
                         <li><a href="#">Drop Down 1</a></li>
@@ -160,7 +159,7 @@
 
             <ol>
                 <li><a href="index.html">메인</a></li>
-                <li><a href="/bootStrap/mainBoard?page=1">게시판</a></li>
+                <li><a href="/board/mainBoard?page=1">게시판</a></li>
                 <li>게시판 상세보기</li>
             </ol>
             <h2>게시판 상세보기</h2>
@@ -175,8 +174,12 @@
             <div class="ellipsis text-muted font-12">
                 <span itemprop="pulishel" th:text="${rDTO.nickName()}"></span>
                 <span class="sp"></span>
-                <i class="fa fa-comment">댓글 아이콘</i>
-                <b class="red">댓글수</b>
+                <i class="fa fa-comment" >
+                    <img src="/images/comment.png">
+                    댓글 수</i>
+                <b class="red">
+                    <img src="/images/eye_icon.png" th:text="${rDTO.readCnt()}">
+                    </b>
                 <span class="sp"></span>
                 <!--                <i class="fa fa-eye" th:text="${rDTO.readCnt()}"></i>-->
                 <span class="pull-right">
@@ -188,6 +191,9 @@
         </div>
         <div class="view-padding">
             <div itemprop="description" class="view-content">
+                <div style="width: 90%; height: 50%; padding-bottom: 10px" id="img"  th:each="dto : ${rList}">
+                    <img th:src="${dto.saveFileUrl()}" width="50%"><br><br>
+                </div>
                 <div th:text="${rDTO.contents()}"></div>
 
             </div>
@@ -220,10 +226,15 @@
 </body>
 
 
-<footer id="footer" class="footer">
-    <!-- Footer 내용 추가 -->
-</footer><!-- End Footer -->
 
+<script src="/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="/vendor/aos/aos.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="/vendor/php-email-form/validate.js"></script>
+<script src="/js/mainForm/main.js"></script>
 
 </body>
 </html>
