@@ -34,8 +34,8 @@ public class S3Service implements IS3Service {
     // Object Storage 접근 public IP
     final String endPoint = "https://kr.object.ncloudstorage.com";
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
+
+    final String bucketName = "gradeadvisor";
 
     private final AmazonS3Client amazonS3Client;
 
