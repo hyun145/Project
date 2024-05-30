@@ -46,7 +46,7 @@ public class BoardService implements IBoardService {
         return nList;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public BoardDTO getBoardInfo(BoardDTO pDTO, boolean type) {
 

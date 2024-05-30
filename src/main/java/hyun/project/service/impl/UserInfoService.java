@@ -152,7 +152,6 @@ public class UserInfoService implements IUserInfoService {
         if(rEntity.isPresent()) {
             rDTO =  new ObjectMapper().convertValue(pEntity, UserInfoDTO.class);
 
-
         } else {
             rDTO = UserInfoDTO.builder().build();
         }
@@ -196,6 +195,100 @@ public class UserInfoService implements IUserInfoService {
         log.info(this.getClass().getName() +".emailCheck End!");
 
         return rDTO;
+    }
+
+    @Override
+    public void updateUserInfo(UserInfoDTO pDTO) throws Exception {
+
+        log.info("내 정보 업데이터 서비스 시작");
+        String userId = CmmUtil.nvl(pDTO.userId());
+        String email = CmmUtil.nvl(EncryptUtil.encAES128CBC(pDTO.email()));
+        String nickName = CmmUtil.nvl(pDTO.nickName());
+
+        log.info("userId : " + userId);
+        log.info("email : " + email);
+        log.info("userName : " + nickName);
+
+        Optional<UserInfoEntity> pEntity = userInfoRepository.findByUserId(userId);
+
+        if(pEntity.isPresent()) {
+
+        UserInfoEntity rEntity = UserInfoEntity.builder().email(email).nickName(nickName)
+                .password(pEntity.get().getPassword())
+                .userName(pEntity.get().getUserName())
+                .userId(userId).build();
+        userInfoRepository.save(rEntity);
+
+
+        } else {
+            UserInfoEntity rEntity = UserInfoEntity.builder().build();
+
+            userInfoRepository.save(rEntity);
+
+
+        }
+
+
+
+
+        log.info("내 정보 업데이터 서비스 종료");
+
+    }
+
+    @Override
+    public UserInfoDTO getMyInfo(UserInfoDTO pDTO) throws Exception {
+
+        String userId = CmmUtil.nvl(pDTO.userId());
+
+        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+        UserInfoEntity pEntity = rEntity.get();
+        UserInfoDTO rDTO;
+
+        if(rEntity.isPresent()) {
+            rDTO =  new ObjectMapper().convertValue(pEntity, UserInfoDTO.class);
+
+
+
+        } else {
+            rDTO = UserInfoDTO.builder().build();
+        }
+
+        return rDTO;
+    }
+
+    @Override
+    public void newPassword2(String userId, String newPassword, String email, String userName) throws Exception {
+
+        log.info("service 비번 업데이트 실행");
+
+        Optional<UserInfoEntity> pEntity = userInfoRepository.findByUserId(userId);
+        log.info("pEntity.password : " + pEntity.get().getPassword());
+
+        log.info("userId : " + userId + "password : " + newPassword + "email:" + email + "userName : " + userName);
+
+        UserInfoEntity rEntity = UserInfoEntity.builder()
+                .userId(userId)
+                .password(newPassword)
+                .userName(userName)
+                .email(email)
+                .nickName(pEntity.get().getNickName())
+                .build();
+
+        userInfoRepository.save(rEntity);
+
+
+    }
+
+    @Override
+    public void deleteUserInfo(String userId) throws Exception {
+
+        log.info("유저 삭제 서비스 시작");
+
+        userInfoRepository.deleteById(userId);
+
+
+        log.info("유저 삭제 서비스 종료");
+
     }
 
     @Override
@@ -321,12 +414,12 @@ public class UserInfoService implements IUserInfoService {
     @Override
     @Transactional
     public int newPassword(UserInfoDTO pDTO) throws Exception {
-        log.info(this.getClass().getName() +".newPasswordProc Start!");
+        log.info(this.getClass().getName() +"비밀번호 재설정 서비스 Start!");
 
         int success = userInfoRepository.updatePassword(pDTO);
 
 
-        log.info(this.getClass().getName() +".newPasswordProc End!");
+        log.info(this.getClass().getName() +"비밀번호 재설정 서비스 End!");
 
         return success;
 

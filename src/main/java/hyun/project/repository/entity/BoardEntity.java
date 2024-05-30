@@ -14,7 +14,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @Builder
 @Entity
-@ToString
+@ToString(exclude = "comments") // comments 필드를 제외하고 출력
 @Cacheable
 public class BoardEntity {
 

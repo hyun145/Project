@@ -1,156 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>로그인</title>
-	<meta charset="UTF-8">
-	<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
-<!--===============================================================================================-->	
-	<link rel="icon" type="image/png" href="/images/icons/favicon.ico"/>
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="/css/material-design-iconic-font.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="/css/animate.css">
-<!--===============================================================================================-->	
-	<link rel="stylesheet" type="text/css" href="/css/hamburgers.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="/css/animsition.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="/css/select2.min.css">
-<!--===============================================================================================-->	
-	<link rel="stylesheet" type="text/css" href="/css/daterangepicker.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="/css/util.css">
-	<link rel="stylesheet" type="text/css" href="/css/main.css">
-<!--===============================================================================================-->
-	<!--===============================================================================================-->
-	<script src="/js/jquery-3.6.0.min.js"></script>
+    <title>로그인</title>
+    <meta charset="UTF-8">
+    <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="/images/icons/favicon.ico"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/material-design-iconic-font.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/hamburgers.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/animsition.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/select2.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/daterangepicker.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="/css/util.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <!--===============================================================================================-->
+    <!--===============================================================================================-->
+    <script src="/js/jquery-3.6.0.min.js"></script>
 
 
-	<script type="text/javascript">
+    <script type="text/javascript">
 
-		$(document).ready(function () {
+        $(document).ready(function () {
 
-			// 회원가입
-			$("#btnUserReg").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-				location.href = "/user/userRegForm";
-			})
+            // 회원가입
+            $("#btnUserReg").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                location.href = "/user/userRegForm";
+            })
 
-			// 메인화면
-			$("#btnMain").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-				location.href = "/html/main";
-			})
-
-
-			// 로그인
-			$("#btnLogin").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-				let f = document.getElementById("f"); // form 태그
-
-				if (f.userId.value === "") {
-					alert("아이디를 입력하세요.");
-					f.userId.focus();
-					return;
-				}
-
-				if (f.password.value === "") {
-					alert("비밀번호를 입력하세요.");
-					f.password.focus();
-					return;
-				}
-
-				// Ajax 호출해서 로그인하기
-				$.ajax({
-							url: "/user/loginProc",
-							type: "post", // 전송방식은 Post
-							dataType: "JSON", // 전송 결과는 JSON으로 받기
-							data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
-							success: function (json) { // /notice/noticeUpdate 호출이 성공했다면..
-
-								if (json.result === 1) { // 로그인 성공
-									location.href = "/board/mainBoard"; // 로그인 성공 페이지 이동
-
-								} else { // 로그인 실패
-									alert(json.msg); // 메시지 띄우기
-									$("#userId").focus(); // 아이디 입력 항목에 마우스 커서 이동
-								}
-
-							}
-						}
-				)
-			})
-		})
+            // 메인화면
+            $("#btnMain").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                location.href = "/html/main";
+            })
 
 
+            // 로그인
+            $("#btnLogin").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                let f = document.getElementById("f"); // form 태그
 
+                if (f.userId.value === "") {
+                    alert("아이디를 입력하세요.");
+                    f.userId.focus();
+                    return;
+                }
 
+                if (f.password.value === "") {
+                    alert("비밀번호를 입력하세요.");
+                    f.password.focus();
+                    return;
+                }
 
+                // Ajax 호출해서 로그인하기
+                $.ajax({
+                    url: "/user/loginProc",
+                    type: "post", // 전송방식은 Post
+                    dataType: "JSON", // 전송 결과는 JSON으로 받기
+                    data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                    success: function (json) { // /notice/noticeUpdate 호출이 성공했다면..
 
-	</script>
+                        if (json.result === 1) { // 로그인 성공
+                            location.href = "/board/mainBoard"; // 로그인 성공 페이지 이동
 
+                        } else { // 로그인 실패
+                            alert(json.msg); // 메시지 띄우기
+                            $("#userId").focus(); // 아이디 입력 항목에 마우스 커서 이동
+                        }
 
-
+                    }
+                })
+            })
+            $("#f").on("keydown", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    $("#btnLogin").click();
+                }
+            });
+        })
+    </script>
 
 
 </head>
 <body>
 <form id="f" name="f">
-	<div class="limiter">
-		<div class="container-login100">
-			<div class="wrap-login100">
-				<form class="login100-form validate-form">
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <form class="login100-form validate-form">
 					<span class="login100-form-title p-b-26">
 						GradeAdvisor
 					</span>
-					
-
-					<div class="wrap-input100 validate-input"  data-validate = "아이디를 입력하세요.">
-						<input class="input100" type="text" name="userId" id="userId" placeholder="아이디">
-					</div>
 
 
-					<div class="wrap-input100 validate-input" data-validate="비밀번호를 입력하세요.">
+                    <div class="wrap-input100 validate-input" data-validate="아이디를 입력하세요.">
+                        <input class="input100" type="text" name="userId" id="userId" placeholder="아이디">
+                    </div>
+
+
+                    <div class="wrap-input100 validate-input" data-validate="비밀번호를 입력하세요.">
 						<span class="btn-show-pass">
 							<i class="zmdi zmdi-eye"></i>
 						</span>
-						<input class="input100" type="password" name="password" id="password" placeholder="비밀번호" >
+                        <input class="input100" type="password" name="password" id="password" placeholder="비밀번호">
 
-					</div>
+                    </div>
 
-					<div class="container-login100-form-btn">
-						<div class="wrap-login100-form-btn">
-							<div class="login100-form-bgbtn"></div>
-							<button class="login100-form-btn" id="btnLogin" type="button">
-								로그인
-							</button>
-						</div>
-						<div class="wrap-login100-form-btn" style="margin-top: 5%">
-							<div class="login100-form-bgbtn"></div>
-							<button class="login100-form-btn" id="btnMain" type="button" >메인</button>
-						</div>
-					</div>
+                    <div class="container-login100-form-btn">
+                        <div class="wrap-login100-form-btn">
+                            <div class="login100-form-bgbtn"></div>
+                            <button class="login100-form-btn" id="btnLogin" type="button">
+                                로그인
+                            </button>
+                        </div>
+                        <div class="wrap-login100-form-btn" style="margin-top: 5%">
+                            <div class="login100-form-bgbtn"></div>
+                            <button class="login100-form-btn" id="btnMain" type="button">메인</button>
+                        </div>
+                    </div>
 
-					<div class="text-center p-t-115">
-						<a href="/user/userRegForm">
-							<i class="bi bi-person"></i> 회원가입
-						</a>
-						<span class="mx-2">|</span>
-						<a href="/user/searchUserId">
-							<i class="bi bi-person-check"></i> 아이디 찾기
-						</a>
-						<span class="mx-2">|</span>
-						<a href="/user/searchPassword">
-							<i class="bi bi-lock"></i> 비밀번호 찾기
-						</a>
-					</div>
+                    <div class="text-center p-t-115">
+                        <a href="/user/userRegForm">
+                            <i class="bi bi-person"></i> 회원가입
+                        </a>
+                        <span class="mx-2">|</span>
+                        <a href="/user/searchUserId">
+                            <i class="bi bi-person-check"></i> 아이디 찾기
+                        </a>
+                        <span class="mx-2">|</span>
+                        <a href="/user/searchPassword">
+                            <i class="bi bi-lock"></i> 비밀번호 찾기
+                        </a>
+                    </div>
 
-				</form>
-			</div>
-		</div>
-	</div>
-	<div id="dropDownSelect1"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="dropDownSelect1"></div>
 </form>
 
 <!--===============================================================================================-->

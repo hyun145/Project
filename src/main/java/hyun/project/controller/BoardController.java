@@ -2,9 +2,11 @@ package hyun.project.controller;
 
 
 import hyun.project.dto.BoardDTO;
+import hyun.project.dto.CommentDTO;
 import hyun.project.dto.FileDTO;
 import hyun.project.dto.MsgDTO;
 import hyun.project.service.IBoardService;
+import hyun.project.service.ICommentService;
 import hyun.project.service.IFileService;
 import hyun.project.service.IS3Service;
 import hyun.project.util.CmmUtil;
@@ -32,6 +34,8 @@ public class BoardController {
     private final IFileService fileService;
     private final IBoardService boardService;
     private final IS3Service s3Service;
+    private final ICommentService commentService;
+
     @GetMapping(value = "boardReg")
     public String boardReg(HttpSession session, ModelMap model) {
         log.info(this.getClass().getName() +".boardReg Start!");
@@ -164,13 +168,15 @@ public class BoardController {
 
         String ssNickName =CmmUtil.nvl((String) session.getAttribute("SS_NICK_NAME"));
 
-
-
+        log.info("ssNickName : " + ssNickName);
 
         log.info("nSeq : " + nSeq);
 
 
         BoardDTO pDTO = BoardDTO.builder().boardSeq(Long.parseLong(nSeq)).build();
+
+        CommentDTO cDTO = CommentDTO.builder()
+                .boardSeq(Long.parseLong(nSeq)).build();
 
 
         List<FileDTO> rList = fileService.getFilePath(Long.parseLong(nSeq));
@@ -181,13 +187,18 @@ public class BoardController {
         BoardDTO rDTO = Optional.ofNullable(boardService.getBoardInfo(pDTO, true))
                         .orElseGet(() -> BoardDTO.builder().build());
 
-        if (ssNickName == "null") {
+        List<CommentDTO> cList = Optional.ofNullable(commentService.getCommentList(cDTO))
+                        .orElseGet(ArrayList::new);
+
+
+
+        if (ssNickName == "null" || ssNickName == null) {
         model.addAttribute("nickNameCheck", 0);
         } else {
 
         boolean nickNameCheck = ssNickName.equals(rDTO.nickName());
 
-        model.addAttribute("nickNameCheck", nickNameCheck);
+        model.addAttribute("nickNameCheck", 1);
 
         }
 
@@ -195,7 +206,11 @@ public class BoardController {
 
         model.addAttribute("rList", rList);
 
-        log.info(this.getClass().getName() +".userGradeInputForm End!");
+
+
+        model.addAttribute("cList", cList);
+
+        log.info(this.getClass().getName() +".게시글 상세보기 컨트롤러 End!");
 
         return "board/boardInfo";
     }
@@ -344,15 +359,6 @@ public class BoardController {
         return dto;
     }
 
-    @GetMapping(value = "portfolio_details")
-    public String portfolio_detailsForm() {
-        log.info(this.getClass().getName() +".portfolio_detailsForm Start!");
-
-        log.info(this.getClass().getName() +".portfolio_detailsForm End!");
-
-        return "board/portfolio_details";
-    }
-
 
     @GetMapping(value = "searchBoard")
     public String searchTitle(@RequestParam (value = "keyword") String keyWord,
@@ -442,7 +448,6 @@ public class BoardController {
             // 조회된 리스트 결과값 넣어주기
         log.info("rList : " + rList);
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".mainBoard End!");
 
         // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
         int itemsPerPage = 10;    // 페이지당 보여줄 게시판 개수 정의.
@@ -463,10 +468,14 @@ public class BoardController {
 
         model.addAttribute("totalPages", totalPages);
 
+        log.info(this.getClass().getName() + ".mainBoard End!");
 
         return "board/mainBoard";
 
     }
+
+
+
 
 
 }

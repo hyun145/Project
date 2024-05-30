@@ -1,21 +1,26 @@
 package hyun.project.repository.entity;
 
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.io.Serializable;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "USER_INFO")
-@DynamicUpdate
 @DynamicInsert
+@DynamicUpdate
 @Builder
-@Cacheable
 @Entity
-public class UserInfoEntity {
+public class UserInfoEntity implements Serializable {
 
     @Id
     @Column(name = "USER_ID")
@@ -52,8 +57,6 @@ public class UserInfoEntity {
     @Column(name = "chg_dt")
     private String chgDt;
 
-    @Column(name = "roles") //권한 데이터는 ,를 구분자로 여러 개(예 : 관리자, 일반사용자) 정의 가능함
-    private String roles;
 
 }
 

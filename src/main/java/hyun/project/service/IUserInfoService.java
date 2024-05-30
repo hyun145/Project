@@ -24,5 +24,13 @@ public interface IUserInfoService {
     UserInfoDTO emailCheck(UserInfoDTO pDTO ) throws Exception;
 
 
+     void updateUserInfo(UserInfoDTO pDTO) throws Exception;
 
+
+
+     UserInfoDTO getMyInfo(UserInfoDTO pDTO) throws Exception;
+
+     void newPassword2(String userId, String newPassword, String email, String userName) throws Exception;
+
+     void deleteUserInfo(String userId) throws Exception;
 }

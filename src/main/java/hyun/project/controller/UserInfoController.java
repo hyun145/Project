@@ -28,6 +28,89 @@ public class UserInfoController {
     private final IUserInfoService userInfoService;
 
 
+    /**
+     * 내 정보 수정 페이지
+     */
+    @GetMapping(value = "myPage")
+    public String myPage() {
+        log.info(this.getClass().getName() +".portfolio_detailsForm Start!");
+
+        log.info(this.getClass().getName() +".portfolio_detailsForm End!");
+
+        return "user/myPage";
+    }
+
+
+
+    @ResponseBody
+    @PostMapping(value = "updateUserInfo")
+    public MsgDTO updateUserInfo(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() +". 내 정보 업데이트 컨트롤러 시작");
+
+        String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+
+        String email = CmmUtil.nvl(request.getParameter("email"));
+        String nickName = CmmUtil.nvl(request.getParameter("nickName"));
+
+        UserInfoDTO pDTO;
+
+        log.info("세션 유저 아이디 : " + userId);
+        log.info("email : " + email );
+        log.info("유저 이름 : " + nickName);
+
+        int res = 0;
+        String msg = "";
+
+        try {
+
+            pDTO = UserInfoDTO.builder().       // Password가 Null이면 안되는데 , Null 값이 찍힐거임. 그래서 에러 발생,
+                    userId(userId).email(email) // DTO 형식으로 하는 건 별로 ?
+                    .nickName(nickName).build();
+
+            userInfoService.updateUserInfo(pDTO);
+            res = 1;
+            msg = "수정되었습니다.";
+        } catch (Exception e) {
+            log.info(e.toString());
+            e.printStackTrace();
+            msg = "오류로 인해 실패하였습니다.";
+        }
+
+
+        log.info(this.getClass().getName() +". 내 정보 업데이트 컨트롤러 종료");
+
+        return MsgDTO.builder().result(res).msg(msg).build();
+
+    }
+
+    /**
+     * 내 정보 수정 페이지 상세
+     */
+    @GetMapping(value = "myPageInfo")
+    public String myPageInfo(ModelMap model, HttpSession session) throws Exception {
+
+        log.info("내 정보 가져오기 컨트롤러 시작");
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+        UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).build();
+
+
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getMyInfo(pDTO))
+                .orElseGet(() -> UserInfoDTO.builder().build());
+
+        log.info("userId : " + userId);
+        log.info("rDTO : " + rDTO);
+        model.addAttribute("rDTO", rDTO);
+
+
+        log.info("내 정보 가져오기 컨트롤러 종료");
+        return "user/myPageInfo";
+    }
+
+
+
+
     @GetMapping(value = "userRegForm")
     public String userRegForm() {
         log.info(this.getClass().getName() + ".user/userRegForm Start!");
@@ -266,6 +349,10 @@ public class UserInfoController {
 
     }
 
+
+    /**
+     * 아이디 찾기
+     */
     @ResponseBody
     @PostMapping(value = "searchUserIdProc")
     public MsgDTO searchUserIdProc(HttpServletRequest request, ModelMap model) throws Exception {
@@ -327,6 +414,9 @@ public class UserInfoController {
         return "/user/searchPassword";
     }
 
+    /**
+     * 비밀번호 찾기
+     */
 
     @PostMapping(value = "searchPasswordProc")
     public String searchPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
@@ -357,6 +447,9 @@ public class UserInfoController {
     }
 
 
+    /**
+     * 로그인창 비밀번호 재설정
+     */
     @PostMapping(value = "newPasswordProc")
     public String newPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
 
@@ -389,8 +482,76 @@ public class UserInfoController {
         return "/user/login";
     }
 
+    /**
+     * 마이페이지 비밀번호 재설정
+     */
+    @ResponseBody
+    @PostMapping(value = "updatePassword")
+    public MsgDTO updatePassword(HttpSession session, HttpServletRequest request) throws Exception {
+        log.info("마이페이지 비밀번호 업데이트 컨트롤러 시작");
+
+        int res = 0;
+        String msg = "";
+        try {
 
 
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+        String email = CmmUtil.nvl(EncryptUtil.encAES128CBC(request.getParameter("email")));
+        String password = CmmUtil.nvl(EncryptUtil.encHashSHA256(request.getParameter("password")));
+        String newPassword = CmmUtil.nvl(EncryptUtil.encHashSHA256(request.getParameter("newPassword")));
+
+        log.info("userId : " + userId);
+        log.info("email : " + email);
+        log.info("password : " + password);
+        log.info("newPassword : " + newPassword);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).email(email)
+                .password(password).build();
+
+
+
+          UserInfoDTO rDTO =Optional.ofNullable(userInfoService.getUserLogin(pDTO))
+                .orElseGet(() -> UserInfoDTO.builder().build());
+
+
+          if (rDTO.userId().equals(userId) || rDTO.password().equals(password)) {
+              userInfoService.newPassword2(userId, newPassword, email, rDTO.userName());
+              msg = "수정되었습니다.";
+              res = 1;
+          }
+
+
+        } catch (Exception e) {
+            res = 0;
+            msg = "입력하신 정보가 일치하지 않습니다. 다시 확인해주세요.";
+        }
+
+        log.info("마이페이지 비밀번호 업데이트 컨트롤러 종료");
+        return MsgDTO.builder().result(res).msg(msg).build();
+    }
+
+
+
+    @ResponseBody
+    @PostMapping(value = "deleteUserInfo")
+    public MsgDTO deleteUserInfo(HttpSession session) throws Exception {
+
+        log.info("회원 탈퇴 컨트롤러 시작");
+
+        String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+
+        log.info("세션에 저장 되있는 유저 아이디 : " + userId);
+
+        userInfoService.deleteUserInfo(userId);
+
+
+
+        log.info("회원 탈퇴 컨트롤러 종료");
+
+        return MsgDTO.builder().
+                msg("탈퇴 완료하였습니다.")
+                .result(1).build();
+    }
 
 
 

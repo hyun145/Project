@@ -27,10 +27,8 @@ public record UserInfoDTO (
         String chgDt,
 
         String existsYn,
-        String roles,
 
         int authNumber
-
 
 ) {
 }

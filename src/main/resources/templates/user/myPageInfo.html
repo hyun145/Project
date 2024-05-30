@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>GradeAdvisor - 메인 게시판</title>
+    <title>마이페이지</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -12,10 +13,10 @@
     <link href="/images/img/favicon.png" rel="icon">
     <link href="/images/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
           rel="stylesheet">
+
     <!-- Vendor CSS Files -->
     <link href="/vendor/aos/aos.css" rel="stylesheet">
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -23,65 +24,156 @@
     <link href="/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
     <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/table.css"/>
-    <link href="/css/mainForm/board.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
     <link href="/css/mainForm/style.css" rel="stylesheet">
+
+    <!-- =======================================================
+    * Template Name: FlexStart
+    * Template URL: https://bootstrapmade.com/flexstart-bootstrap-startup-template/
+    * Updated: Mar 17 2024 with Bootstrap v5.3.3
+    * Author: BootstrapMade.com
+    * License: https://bootstrapmade.com/license/
+    ======================================================== -->
+
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
-        function doDetail(seq) {
-            location.href = "/board/boardInfo?nSeq=" + seq;
-        }
 
         $(document).ready(function () {
-            $("#btnSearch").on("click", function () {
-               let f = document.getElementById("f");
 
-               if (f.keyword.value === "") {
-                   alert("검색어를 입력해주세요.");
-                   f.keyword.focus();
-                   return;
-               }
-             /*   $.ajax({
-                    url: "/board/boardDelete",
-                    type: "post",
-                    dataType: "JSON",
-                    data: {"nSeq": nSeq},
-                    success:
-                        function (json) {
-                            alert(json.msg);
-                            location.href = "/board/mainBoard?page=1";
-                        }
-                })*/
+            let f = document.getElementById("f");
 
+            let pf = document.getElementById("chgPw")
+
+            $("#btnSend").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                doSubmit(f);
+            })
+            $("#btnChgPw").on("click", function () {
+                doSubmitPw(pf);
+            });
+            $("#btnDel").on("click", function () {
+                doSubmitDel();
+            })
+        });
+
+        function doSubmitDel() {
+
+            $.ajax({
+                url: "/user/deleteUserInfo",
+                type: "post",
+                dataType: "JSON",
+                success: function (json) {
+                    alert(json.msg);
+                    location.href = "/user/login";
+                }
             })
 
-        })
+        }
 
 
+        function doSubmit(f) {
 
+            if (f.nickName.value === "") {
+                alert("닉네임을 입력해주세요.");
+                f.nickName.focus();
+                return;
+            }
+            if (f.email.value === "") {
+                alert("이메일을 입력해주세요.");
+                f.email.focus();
+                return;
+            }
+
+            $.ajax({
+                url: "/user/updateUserInfo",
+                type: "post",
+                dataType: "JSON",
+                data: $("#f").serialize(),
+                success: function (json) {
+
+                    alert(json.msg);
+
+                    if (json.result === 1) {
+                        location.reload()
+                    }
+                }
+            })
+        }
+        function doSubmitPw(pf) {
+            if (pf.password.value === "") {
+                alert("현재 비밀번호를 입력하세요.");
+                pf.password.focus();
+                return;
+            }
+            if (pf.newPassword.value === "") {
+                alert("새 비밀번호를 입력하세요.");
+                pf.newPassword.focus();
+                return;
+            }
+            if (pf.newPassword2.value === "") {
+                alert("새 비밀번호 확인을 입력하세요.");
+                pf.newPassword2.focus();
+                return;
+            }
+            if (pf.newPassword2.value !== pf.newPassword.value) {
+                alert("새 비밀번호 확인이 일치하지 않습니다.");
+                pf.newPassword2.focus();
+                return;
+            }
+            console.log(pf.password.value);
+
+            const requestData = {
+                email: document.getElementById("email").value,
+                userName: document.getElementById("userName").value,
+                password: document.getElementById("password").value,
+                newPassword: document.getElementById("newPassword").value
+            }
+            console.log(requestData);
+
+            $.ajax({
+                url: "/user/updatePassword",
+                type: "post",
+                dataType: "JSON",
+                data: requestData,
+                success: function (json) {
+                    console.log(json);
+                    alert(json.msg);
+
+                    if (json.result === 1) {
+                        window.location.reload();
+                    }
+                }
+            })
+
+        }
     </script>
 
 
+    <style>
+        body {
+            padding-top: 70px; /* 헤더 높이 만큼 상단 패딩 추가 */
+        }
+
+    </style>
 </head>
 
 <body>
 
 
 <!-- ======= Header ======= -->
-
 <header id="header" class="header fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-        <a href="index.html" class="logo d-flex align-items-center">
+        <a href="../board/index.html" class="logo d-flex align-items-center">
             <img src="/images/img/logo.png" alt="">
             <span>GradeAdvisor</span>
         </a>
 
         <nav id="navbar" class="navbar">
             <ul>
-                <li><a class="nav-link scrollto " href="#hero">홈</a></li>
-                <li><a class="nav-link scrollto" href="/../user/myPage">마이 페이지</a></li>
-                <li><a class="active" href="/board/mainBoard">게시판</a></li>
+                <li><a class="nav-link scrollto" href="#hero">홈</a></li>
+                <li><a class="active" href="#team">마이 페이지</a></li>
+                <li><a class="nav-link scrollto" href="/board/mainBoard">게시판</a></li>
                 <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
                     <ul>
                         <li><a href="#">Drop Down 1</a></li>
@@ -99,7 +191,6 @@
                         <li><a href="#">Drop Down 4</a></li>
                     </ul>
                 </li>
-
                 <li class="dropdown megamenu"><a href="#"><span>Mega Menu</span> <i class="bi bi-chevron-down"></i></a>
                     <ul>
                         <li>
@@ -125,7 +216,6 @@
                     </ul>
                 </li>
 
-
                 <li><a class="getstarted scrollto" href="/user/login">로그인</a></li>
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>
@@ -134,116 +224,90 @@
     </div>
 </header><!-- End Header -->
 
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">회원 정보 수정</h1>
+        <div class="card mb-4">
+            <div class="card-header">회원 정보 수정</div>
+            <form id="f" name="f">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">아이디:</label>
+                    <p id="userId" class="form-control-plaintext" th:text="${rDTO.userId()}"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">이름:</label>
+                    <p id="userName" class="form-control-plaintext" th:text="${rDTO.userName()}"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">이메일(수정가능):</label>
+                    <input type="text" class="form-control" id="email" name="email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">닉네임(수정가능):</label>
+                    <input type="text" class="form-control" id="nickName" name="nickName">
+                </div>
 
-<main id="main">
+                <button type="button" id="btnSend" class="btn btn-primary">수정</button>
 
-    <!-- ======= Breadcrumbs ======= -->
-    <section class="breadcrumbs">
-        <div class="container">
-
-            <ol>
-                <li><a href="/만들어야됨.">홈</a></li>
-                <li><a>게시판</a></li>
-            </ol>
-            <h2>게시판</h2>
-
+            </div>
+            </form>
         </div>
-    </section><!-- End Breadcrumbs -->
 
-    <!-- ======= Blog Single Section ======= -->
+        <form name="chgPw" id="chgPw">
+            <div class="card mb-4">
+                <div class="card-header">비밀번호 변경</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">현재 비밀번호</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="현재 비밀번호를 입력하세요">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">새 비밀번호</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="새 비밀번호를 입력하세요">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">새 비밀번호 확인</label>
+                        <input type="password" class="form-control" id="newPassword2" name="newPassword2" placeholder="새 비밀번호를 다시 입력하세요">
+                    </div>
+                    <button type="button" id="btnChgPw" class="btn btn-primary">비밀번호 변경</button>
+                </div>
+            </div>
+        </form>
 
-
-</main><!-- End #main -->
+        <div class="card">
+            <div class="card-header">회원 탈퇴</div>
+            <div class="card-body">
+                <p>회원 탈퇴를 원하시면 아래 버튼을 클릭하세요. 이 작업은 되돌릴 수 없습니다.</p>
+                <button class="btn btn-danger" id="btnDel">회원 탈퇴</button>
+            </div>
+        </div>
+    </div>
 
 <!-- ======= Footer ======= -->
 <footer id="footer" class="footer">
+
     <div class="footer-newsletter">
         <div class="container">
-              <!--  <div class="col-lg-6 text-center">
-                    <form id="f" action="/bootStrap/searchBoard">
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control"  id="keyword" name="keyword" style="width: 50%">
-                            <button class="btn btn-outline-secondary" type="button" id="btnSearch" name="btnSearch">검색</button>
-                        </div>
-                    </form>
-                </div>-->
-                <div class="footer-newsletter">
-                    <form class="form-wrapper cf" id="f" action="/board/searchBoard" method="get">
-                        <input type="text" id="keyword" name="keyword">
-                        <button type="submit" id="btnSearch" >검색</button>
+            <div class="row justify-content-center">
+                <div class="col-lg-12 text-center">
+                    <h4>Our Newsletter</h4>
+                    <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
+                </div>
+                <div class="col-lg-6">
+                    <form action="" method="post">
+                        <input type="email" name="email"><input type="submit" value="Subscribe">
                     </form>
                 </div>
-
-                <div th:if = "${nickNameCheck}">
-                        <a href="/board/boardReg" class="btn">글쓰기</a>
-                        <a href="/user/myPage" class="btn">마이페이지</a>
-                </div>
-
-
-            <div id="board-list">
-                <div class="container">
-                    <table class="board-table" id="listTable">
-                        <thead>
-                        <tr>
-                            <th scope="col" class="th-title">제목</th>
-                            <th scope="col" class="th-nickName">닉네임</th>
-                            <th scope="col" class="th-date">등록일</th>
-                            <th scope="col" class="th-cnt">조회수</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr class="text-center" th:each="dto : ${rList}">
-                            <td th:text="${dto.title}" th:onclick="doDetail([[${dto.boardSeq}]])"></td>
-                            <td th:text="${dto.nickName}"></td>
-                            <td th:text="${dto.regDt}"></td>
-                            <td th:text="${dto.readCnt}"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
-            <!-- 페이지 번호를 표시하는 부분 -->
-            <div style="display: flex; display: block; margin-left: 40%">
-                <div class="pagination">
-                    <ul class="pagination pagination-primary" id="pagination">
-                        <li class="page-item">
-                            <a class="page-link" th:href="@{/board/mainBoard?page=1}">&laquo;</a>
-                        </li>
-                        <!-- 이전 페이지로 이동하는 링크 -->
-                        <li class="page-item" th:if="${currentPage > 1}">
-                            <a class="page-link"
-                               th:href="@{/board/mainBoard(page=${currentPage - 1})}">&lt;</a>
-                        </li>
-                        <!-- 현재 페이지 주변에 페이지 번호 링크 표시 -->
-                        <th:block th:each="pageNumber : ${#numbers.sequence(T(java.lang.Math).max(1, currentPage - 5), T(java.lang.Math).min(totalPages, currentPage + 5))}">
-                            <li class="page-item"
-                                th:class="${pageNumber == currentPage ? 'active' : ''}">
-                                <a class="page-link" th:href="@{/board/mainBoard(page=${pageNumber})}"
-                                   th:text="${pageNumber}"></a>
-                            </li>
-                        </th:block>
-                        <!-- 다음 페이지로 이동하는 링크 -->
-                        <li class="page-item" th:if="${currentPage < totalPages}">
-                            <a class="page-link"
-                               th:href="@{/board/mainBoard(page=${currentPage + 1})}">&gt;</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" th:href="@{/board/mainBoard(page=${totalPages})}">&raquo;</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
         </div>
-
-
     </div>
 
     <div class="footer-top">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-lg-5 col-md-12 footer-info">
-                    <a href="index.html" class="logo d-flex align-items-center">
+                    <a href="../board/index.html" class="logo d-flex align-items-center">
                         <img src="/images/img/logo.png" alt="">
                         <span>FlexStart</span>
                     </a>
@@ -265,9 +329,9 @@
                         <li><i class="bi bi-chevron-right"></i> <a href="#">Services</a></li>
                         <li><i class="bi bi-chevron-right"></i> <a href="#">Terms of service</a></li>
                         <li><i class="bi bi-chevron-right"></i> <a href="#">Privacy policy</a></li>
-                    </ul>
-                </div>
 
+
+                </div>
                 <div class="col-lg-2 col-6 footer-links">
                     <h4>Our Services</h4>
                     <ul>
@@ -321,7 +385,7 @@
 <script src="/vendor/swiper/swiper-bundle.min.js"></script>
 <script src="/vendor/php-email-form/validate.js"></script>
 
-<!--  &lt;!&ndash; Template Main JS File &ndash;&gt;-->
+<!-- Template Main JS File -->
 <script src="/js/mainForm/main.js"></script>
 
 </body>

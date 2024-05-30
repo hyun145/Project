@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Portfolio Details - FlexStart Bootstrap Template</title>
+  <title>마이페이지</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -34,6 +34,23 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+
+  <style>
+    body {
+      padding-top: 70px; /* 헤더 높이 만큼 상단 패딩 추가 */
+    }
+    .icon-card {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .icon-card:hover {
+      transform: scale(1.05);
+    }
+    .icon {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 
 <body>
@@ -42,19 +59,16 @@
   <header id="header" class="header fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-      <a href="index.html" class="logo d-flex align-items-center">
+      <a href="../board/index.html" class="logo d-flex align-items-center">
         <img src="/images/img/logo.png" alt="">
-        <span>FlexStart</span>
+        <span>GradeAdvisor</span>
       </a>
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto " href="#hero">Home</a></li>
-          <li><a class="nav-link scrollto" href="#about">About</a></li>
-          <li><a class="nav-link scrollto" href="#services">Services</a></li>
-          <li><a class="nav-link scrollto" href="#portfolio">Portfolio</a></li>
-          <li><a class="nav-link scrollto" href="#team">Team</a></li>
-          <li><a href="boardReg.html">Blog</a></li>
+          <li><a class="nav-link scrollto" href="#hero">홈</a></li>
+          <li><a class="active" href="user/myPage">마이 페이지</a></li>
+          <li><a class="nav-link scrollto" href="/board/mainBoard">게시판</a></li>
           <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="#">Drop Down 1</a></li>
@@ -72,7 +86,6 @@
               <li><a href="#">Drop Down 4</a></li>
             </ul>
           </li>
-
           <li class="dropdown megamenu"><a href="#"><span>Mega Menu</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li>
@@ -98,15 +111,13 @@
             </ul>
           </li>
 
-          <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
-          <li><a class="getstarted scrollto" href="#about">Get Started</a></li>
+          <li><a class="getstarted scrollto" href="/user/login">로그인</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
 
     </div>
   </header><!-- End Header -->
-
   <main id="main">
 
     <!-- ======= Breadcrumbs ======= -->
@@ -114,65 +125,51 @@
       <div class="container">
 
         <ol>
-          <li><a href="index.html">Home</a></li>
-          <li>Portfolio Details</li>
+          <li><a href="/main/index.html">홈</a></li>
+          <li>마이 페이지</li>
         </ol>
-        <h2>Portfolio Details</h2>
+        <h2>마이 페이지</h2>
 
       </div>
-    </section><!-- End Breadcrumbs -->
+    </section>
+  </main>
 
-    <!-- ======= Portfolio Details Section ======= -->
-    <section id="portfolio-details" class="portfolio-details">
-      <div class="container">
-
-        <div class="row gy-4">
-
-          <div class="col-lg-8">
-            <div class="portfolio-details-slider swiper">
-              <div class="swiper-wrapper align-items-center">
-
-                <div class="swiper-slide">
-                  <img src="/images/img/portfolio/portfolio-1.jpg" alt="">
-                </div>
-
-                <div class="swiper-slide">
-                  <img src="/images/img/portfolio/portfolio-2.jpg" alt="">
-                </div>
-
-                <div class="swiper-slide">
-                  <img src="/images/img/portfolio/portfolio-3.jpg" alt="">
-                </div>
-
-              </div>
-              <div class="swiper-pagination"></div>
-            </div>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-4">
+        <div class="card icon-card text-center p-4" onclick=location.href="myPageInfo">
+          <div class="icon text-primary">
+            <i class="fas fa-user-edit"></i>
           </div>
-
-          <div class="col-lg-4">
-            <div class="portfolio-info">
-              <h3>Project information</h3>
-              <ul>
-                <li><strong>Category</strong>: Web design</li>
-                <li><strong>Client</strong>: ASU Company</li>
-                <li><strong>Project date</strong>: 01 March, 2020</li>
-                <li><strong>Project URL</strong>: <a href="#">www.example.com</a></li>
-              </ul>
-            </div>
-            <div class="portfolio-description">
-              <h2>This is an example of portfolio detail</h2>
-              <p>
-                Autem ipsum nam porro corporis rerum. Quis eos dolorem eos itaque inventore commodi labore quia quia. Exercitationem repudiandae officiis neque suscipit non officia eaque itaque enim. Voluptatem officia accusantium nesciunt est omnis tempora consectetur dignissimos. Sequi nulla at esse enim cum deserunt eius.
-              </p>
-            </div>
-          </div>
-
+          <h5 class="card-title">내 정보 수정하기</h5>
         </div>
-
       </div>
-    </section><!-- End Portfolio Details Section -->
+      <div class="col-md-4">
+        <div class="card icon-card text-center p-4" onclick="location.href='#manage-posts'">
+          <div class="icon text-success">
+            <i class="fas fa-clipboard-list"></i>
+          </div>
+          <h5 class="card-title">성적 입력 / 수정하기</h5>
+        </div>
+      </div>
+    </div>
 
-  </main><!-- End #main -->
+    <div class="row mt-5">
+      <div class="col-md-12">
+
+        <div id="manage-posts" class="border p-4">
+          <h3>내 글 관리</h3>
+          <ul class="list-group">
+            <li class="list-group-item">글 제목 1 <button class="btn btn-sm btn-danger float-right">삭제</button></li>
+            <li class="list-group-item">글 제목 2 <button class="btn btn-sm btn-danger float-right">삭제</button></li>
+            <li class="list-group-item">글 제목 3 <button class="btn btn-sm btn-danger float-right">삭제</button></li>
+            <!-- 더 많은 글들을 여기에 추가할 수 있습니다 -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
@@ -197,7 +194,7 @@
       <div class="container">
         <div class="row gy-4">
           <div class="col-lg-5 col-md-12 footer-info">
-            <a href="index.html" class="logo d-flex align-items-center">
+            <a href="../board/index.html" class="logo d-flex align-items-center">
               <img src="/images/img/logo.png" alt="">
               <span>FlexStart</span>
             </a>
@@ -218,9 +215,9 @@
               <li><i class="bi bi-chevron-right"></i> <a href="#">Services</a></li>
               <li><i class="bi bi-chevron-right"></i> <a href="#">Terms of service</a></li>
               <li><i class="bi bi-chevron-right"></i> <a href="#">Privacy policy</a></li>
-            </ul>
-          </div>
 
+
+          </div>
           <div class="col-lg-2 col-6 footer-links">
             <h4>Our Services</h4>
             <ul>
