@@ -2,276 +2,275 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>마이페이지</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+    <title>마이페이지</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
 
-  <!-- Favicons -->
-  <link href="/images/img/favicon.png" rel="icon">
-  <link href="/images/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <!-- Favicons -->
+    <link href="/images/img/favicon.png" rel="icon">
+    <link href="/images/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+          rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
-  <link href="/vendor/aos/aos.css" rel="stylesheet">
-  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="/css/myTable.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
-  <link href="/css/mainForm/style.css" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="/css/mainForm/style.css" rel="stylesheet">
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        const ssUserId = [[${session.SS_USER_ID}]];
 
-  <!-- =======================================================
-  * Template Name: FlexStart
-  * Template URL: https://bootstrapmade.com/flexstart-bootstrap-startup-template/
-  * Updated: Mar 17 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+        console.log(ssUserId);
+            if(!ssUserId) {
+                console.log("일로 들어옴. ")
+                alert("로그인 후 이용 가능합니다.");
+                window.location.href = "/main";
+            }
 
-  <style>
-    body {
-      padding-top: 70px; /* 헤더 높이 만큼 상단 패딩 추가 */
-    }
-    .icon-card {
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .icon-card:hover {
-      transform: scale(1.05);
-    }
-    .icon {
-      font-size: 2em;
-      margin-bottom: 10px;
-    }
-  </style>
+
+
+    </script>
+
+    <!-- =======================================================
+    * Template Name: FlexStart
+    * Template URL: https://bootstrapmade.com/flexstart-bootstrap-startup-template/
+    * Updated: Mar 17 2024 with Bootstrap v5.3.3
+    * Author: BootstrapMade.com
+    * License: https://bootstrapmade.com/license/
+    ======================================================== -->
+
+    <style>
+        body {
+            padding-top: 70px; /* 헤더 높이 만큼 상단 패딩 추가 */
+        }
+
+        .icon-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .icon-card:hover {
+            transform: scale(1.05);
+        }
+
+        .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 
 <body>
 
-  <!-- ======= Header ======= -->
-  <header id="header" class="header fixed-top">
+<!-- ======= Header ======= -->
+<header id="header" class="header fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-      <a href="../board/index.html" class="logo d-flex align-items-center">
-        <img src="/images/img/logo.png" alt="">
-        <span>GradeAdvisor</span>
-      </a>
+        <a href="../board/index.html" class="logo d-flex align-items-center">
+            <img src="/images/img/logo.png" alt="">
+            <span>GradeAdvisor</span>
+        </a>
 
-      <nav id="navbar" class="navbar">
-        <ul>
-          <li><a class="nav-link scrollto" href="#hero">홈</a></li>
-          <li><a class="active" href="user/myPage">마이 페이지</a></li>
-          <li><a class="nav-link scrollto" href="/board/mainBoard">게시판</a></li>
-          <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
+        <nav id="navbar" class="navbar">
             <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Drop Down 2</a></li>
-              <li><a href="#">Drop Down 3</a></li>
-              <li><a href="#">Drop Down 4</a></li>
-            </ul>
-          </li>
-          <li class="dropdown megamenu"><a href="#"><span>Mega Menu</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li>
-                <a href="#">Column 1 link 1</a>
-                <a href="#">Column 1 link 2</a>
-                <a href="#">Column 1 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 2 link 1</a>
-                <a href="#">Column 2 link 2</a>
-                <a href="#">Column 3 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 3 link 1</a>
-                <a href="#">Column 3 link 2</a>
-                <a href="#">Column 3 link 3</a>
-              </li>
-              <li>
-                <a href="#">Column 4 link 1</a>
-                <a href="#">Column 4 link 2</a>
-                <a href="#">Column 4 link 3</a>
-              </li>
-            </ul>
-          </li>
+                <li><a class="nav-link scrollto" href="/main">홈</a></li>
+                <li><a class="active" href="user/myPage">마이 페이지</a></li>
+                <li><a class="nav-link scrollto" href="/board/mainBoard">게시판</a></li>
+                <li><a class="nav-link scrollto" href="/depart/getDepart">학과 정보</a></li>
+                <li><a class="nav-link scrollto" href="#hero">합격률 예측</a></li>
 
-          <li><a class="getstarted scrollto" href="/user/login">로그인</a></li>
-        </ul>
-        <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
+
+                <li th:unless="${nickNameCheck}">
+                    <a class="getstarted scrollto" href="/user/login">로그인</a>
+                </li>
+                <li th:if="${nickNameCheck}">
+                    <a class="getstarted scrollto" id="logout"> 로그아웃</a>
+                </li>
+            </ul>
+            <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
 
     </div>
-  </header><!-- End Header -->
-  <main id="main">
+</header><!-- End Header -->
+<main id="main">
 
     <!-- ======= Breadcrumbs ======= -->
     <section class="breadcrumbs">
-      <div class="container">
+        <div class="container">
 
-        <ol>
-          <li><a href="/main/index.html">홈</a></li>
-          <li>마이 페이지</li>
-        </ol>
-        <h2>마이 페이지</h2>
+            <ol>
+                <li><a href="/main/index.html">홈</a></li>
+                <li>마이 페이지</li>
+            </ol>
+            <h2>마이 페이지</h2>
 
-      </div>
+        </div>
     </section>
-  </main>
+</main>
 
-  <div class="container mt-5">
+<div class="container mt-5">
     <div class="row justify-content-center">
-      <div class="col-md-4">
-        <div class="card icon-card text-center p-4" onclick=location.href="myPageInfo">
-          <div class="icon text-primary">
-            <i class="fas fa-user-edit"></i>
-          </div>
-          <h5 class="card-title">내 정보 수정하기</h5>
+        <div class="col-md-4">
+            <div class="card icon-card text-center p-4" onclick=location.href="myPageInfo">
+                <div class="icon text-primary">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+                <h5 class="card-title">내 정보 수정하기</h5>
+            </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card icon-card text-center p-4" onclick="location.href='#manage-posts'">
-          <div class="icon text-success">
-            <i class="fas fa-clipboard-list"></i>
-          </div>
-          <h5 class="card-title">성적 입력 / 수정하기</h5>
+        <div class="col-md-4">
+            <div class="card icon-card text-center p-4" onclick="location.href='#manage-posts'">
+                <div class="icon text-success">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h5 class="card-title">성적 입력 / 수정하기</h5>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="row mt-5">
-      <div class="col-md-12">
+        <div class="col-md-12">
 
-        <div id="manage-posts" class="border p-4">
-          <h3>내 글 관리</h3>
-          <ul class="list-group">
-            <li class="list-group-item">글 제목 1 <button class="btn btn-sm btn-danger float-right">삭제</button></li>
-            <li class="list-group-item">글 제목 2 <button class="btn btn-sm btn-danger float-right">삭제</button></li>
-            <li class="list-group-item">글 제목 3 <button class="btn btn-sm btn-danger float-right">삭제</button></li>
-            <!-- 더 많은 글들을 여기에 추가할 수 있습니다 -->
-          </ul>
+            <div>
+                <h3>내 글 관리</h3>
+                <div class="table">
+                    <div class="thead">
+                        <div class="tr"> 제목 </div>
+                    </div>
+                    <div class="tr" th:each="dto : ${rList}">
+                        <div class="td" th:text="${dto.title()}"></div>
+                    </div>
+                </div>
+
+                <!--<ul class="list-group" th:each="dto : ${rList}">
+                  <li class="list-group-item" th:text="{dto.nickName()}">-->
+                <button type="button" class="btn btn-danger" id="btnDel">삭제</button>
+                <button type="button" class="btn btn-info" id="btnEdit">수정</button>
+                </li>
+
+                <!-- 더 많은 글들을 여기에 추가할 수 있습니다 -->
+                </ul>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 
 
-  <!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
+<!-- ======= Footer ======= -->
+<footer id="footer" class="footer">
 
     <div class="footer-newsletter">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-12 text-center">
-            <h4>Our Newsletter</h4>
-            <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
-          </div>
-          <div class="col-lg-6">
-            <form action="" method="post">
-              <input type="email" name="email"><input type="submit" value="Subscribe">
-            </form>
-          </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-12 text-center">
+                    <h4>Our Newsletter</h4>
+                    <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
+                </div>
+                <div class="col-lg-6">
+                    <form action="" method="post">
+                        <input type="email" name="email"><input type="submit" value="Subscribe">
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="footer-top">
-      <div class="container">
-        <div class="row gy-4">
-          <div class="col-lg-5 col-md-12 footer-info">
-            <a href="../board/index.html" class="logo d-flex align-items-center">
-              <img src="/images/img/logo.png" alt="">
-              <span>FlexStart</span>
-            </a>
-            <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
-            <div class="social-links mt-3">
-              <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-              <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-              <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-              <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-5 col-md-12 footer-info">
+                    <a href="../board/index.html" class="logo d-flex align-items-center">
+                        <img src="/images/img/logo.png" alt="">
+                        <span>FlexStart</span>
+                    </a>
+                    <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita
+                        valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
+                    <div class="social-links mt-3">
+                        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-6 footer-links">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Home</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">About us</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Services</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Terms of service</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Privacy policy</a></li>
+
+
+                </div>
+                <div class="col-lg-2 col-6 footer-links">
+                    <h4>Our Services</h4>
+                    <ul>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Web Design</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Web Development</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Product Management</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Marketing</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">Graphic Design</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+                    <h4>Contact Us</h4>
+                    <p>
+                        A108 Adam Street <br>
+                        New York, NY 535022<br>
+                        United States <br><br>
+                        <strong>Phone:</strong> +1 5589 55488 55<br>
+                        <strong>Email:</strong> info@example.com<br>
+                    </p>
+
+                </div>
+
             </div>
-          </div>
-
-          <div class="col-lg-2 col-6 footer-links">
-            <h4>Useful Links</h4>
-            <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Home</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">About us</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Services</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Terms of service</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Privacy policy</a></li>
-
-
-          </div>
-          <div class="col-lg-2 col-6 footer-links">
-            <h4>Our Services</h4>
-            <ul>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Web Design</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Web Development</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Product Management</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Marketing</a></li>
-              <li><i class="bi bi-chevron-right"></i> <a href="#">Graphic Design</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
-            <h4>Contact Us</h4>
-            <p>
-              A108 Adam Street <br>
-              New York, NY 535022<br>
-              United States <br><br>
-              <strong>Phone:</strong> +1 5589 55488 55<br>
-              <strong>Email:</strong> info@example.com<br>
-            </p>
-
-          </div>
-
         </div>
-      </div>
     </div>
 
     <div class="container">
-      <div class="copyright">
-        &copy; Copyright <strong><span>FlexStart</span></strong>. All Rights Reserved
-      </div>
-      <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/flexstart-bootstrap-startup-template/ -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-      </div>
+        <div class="copyright">
+            &copy; Copyright <strong><span>FlexStart</span></strong>. All Rights Reserved
+        </div>
+        <div class="credits">
+            <!-- All the links in the footer should remain intact. -->
+            <!-- You can delete the links only if you purchased the pro version. -->
+            <!-- Licensing information: https://bootstrapmade.com/license/ -->
+            <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/flexstart-bootstrap-startup-template/ -->
+            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        </div>
     </div>
-  </footer><!-- End Footer -->
+</footer><!-- End Footer -->
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+        class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Vendor JS Files -->
-  <script src="/vendor/purecounter/purecounter_vanilla.js"></script>
-  <script src="/vendor/aos/aos.js"></script>
-  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="/vendor/php-email-form/validate.js"></script>
+<!-- Vendor JS Files -->
+<script src="/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="/vendor/aos/aos.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="/vendor/php-email-form/validate.js"></script>
 
-  <!-- Template Main JS File -->
-  <script src="/js/mainForm/main.js"></script>
+<!-- Template Main JS File -->
+<script src="/js/mainForm/main.js"></script>
 
 </body>
 

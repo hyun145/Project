@@ -1,8 +1,10 @@
 package hyun.project.controller;
 
 
+import hyun.project.dto.BoardDTO;
 import hyun.project.dto.MsgDTO;
 import hyun.project.dto.UserInfoDTO;
+import hyun.project.service.IBoardService;
 import hyun.project.service.IUserInfoService;
 import hyun.project.util.CmmUtil;
 import hyun.project.util.EncryptUtil;
@@ -16,7 +18,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -26,16 +31,34 @@ import java.util.Optional;
 public class UserInfoController {
 
     private final IUserInfoService userInfoService;
+    private final IBoardService boardService;
 
 
     /**
      * 내 정보 수정 페이지
      */
     @GetMapping(value = "myPage")
-    public String myPage() {
-        log.info(this.getClass().getName() +".portfolio_detailsForm Start!");
+    public String myPage(HttpSession session, RedirectAttributes redirectAttributes,
+                         ModelMap model) {
+        log.info(this.getClass().getName() +".마이페이지 Start!");
 
-        log.info(this.getClass().getName() +".portfolio_detailsForm End!");
+        String ssUserId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+        log.info("ssUserId:" + ssUserId);
+
+        try {
+
+        List<BoardDTO> rList = Optional.ofNullable(boardService.findByBoardByUserId(ssUserId))
+                .orElseGet(ArrayList::new);
+
+        model.addAttribute("rList", rList);
+
+        } catch (Exception e) {
+            log.info(e.toString());
+            e.printStackTrace();
+        }
+
+
+        log.info(this.getClass().getName() +".마이페이지 End!");
 
         return "user/myPage";
     }
@@ -218,6 +241,7 @@ public class UserInfoController {
         log.info(this.getClass().getName() +".login Start!");
         log.info(this.getClass().getName() +".login End!");
 
+
         return "user/login";
     }
 
@@ -281,6 +305,9 @@ public class UserInfoController {
 
         session.setAttribute("SS_USER_ID", "");
         session.removeAttribute("SS_USER_ID");
+
+        session.setAttribute("SS_NICK_NAME", "");
+        session.removeAttribute("SS_NICK_NAME");
 
         MsgDTO dto = MsgDTO.builder().msg("로그아웃하였습니다.").result(1).build();
 
@@ -542,7 +569,10 @@ public class UserInfoController {
 
         log.info("세션에 저장 되있는 유저 아이디 : " + userId);
 
+
+        boardService.deleteBoardByUserId(userId);
         userInfoService.deleteUserInfo(userId);
+
 
 
 

@@ -123,7 +123,7 @@
 
         <nav id="navbar" class="navbar">
             <ul>
-                <li><a class="nav-link scrollto" href="#hero">홈</a></li>
+                <li><a class="nav-link scrollto" href="/main">홈</a></li>
                 <li><a class="sav-link scrollto" href="../user/myPage">마이 페이지</a></li>
                 <li><a class="active" href="/board/mainBoard?page=1">게시판</a></li>
                 <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
@@ -227,12 +227,12 @@
         </div>
 
 
-        <!--    <div th:if = "${nickNameCheck}">
-                &lt;!&ndash; 수정 버튼 &ndash;&gt;
-                &lt;!&ndash;        <a th:href="@{/post/edit/{postId}(postId=${post.id})}">수정</a>&ndash;&gt;
-                <button id="btnEdit" type="button">수정</button>
-                <button id="btnDelete" type="button">삭제</button>
-            </div>-->
+            <div th:if = "${nickNameCheck}">
+                <!-- 수정 버튼 -->
+                <!--        <a th:href="@{/post/edit/{postId}(postId=${post.id})}">수정</a>-->
+                <button id="btnEdit" type="button" class="btn btn-info">수정</button>
+                <button id="btnDelete" type="button" class="btn btn-danger">삭제</button>
+            </div>
 
     </section>
 
@@ -260,7 +260,7 @@
     <div class="card">
         <div class="card-header bi bi-chat-right-dots">댓글 작성</div>
         <input type="hidden" name="nSeq" th:value="${rDTO.boardSeq()}"/>
-        <div th:if="${nickNameCheck}">
+        <div th:if="${globalSession}">
             <div class="card-body">
                 <textarea id="comment" name="comment" class="form-control" rows="4" placeholder="댓글을 입력하세요"></textarea>
             </div>
@@ -270,7 +270,7 @@
                 </button>
             </div>
         </div>
-        <div th:unless="${nickNameCheck}">
+        <div th:unless="${globalSession}">
             <div class="card-body" style="font-size: small">
                 <a href="/user/login">로그인</a>을 하시면 댓글을 등록할 수 있습니다.
             </div>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Departments</title>
+    <link rel="stylesheet" href="/css/table.css"/>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#btnCollectDepartInfo").on("click", function () {
+                $.ajax({
+                    url: "/depart/departInfo",
+                    type: "post",
+                    dataType: "JSON",
+                }).then(
+                    function (json) {
+                        const result = json.data;
+                        for (const data of result) {
+                            $("#departData").append("<div class=\"divTableRow\">")
+                            $("#departData").append("<div class=\divTableCell\">" + data.korMjrNm + "</div>");
+                            $("#departData").append("<div class=\divTableCell\">" + data.korSchlNm + "</div>");
+                            $("#departData").append("<div class=\divTableCell\">" + data.lsnTrmNm + "</div>");
+                            $("#departData").append("<div class=\divTableCell\">" + data.dghtDivNm + "</div>");
+                            $("#departData").append("<div class=\divTableCell\">" + data.korSrsSclftNm + "</div>");
+                            $("#departData").append("</div>");
+
+
+                        }
+
+                    }
+                )
+
+            })
+
+        })
+
+    </script>
+    <style>
+        .table {
+            display: table;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        .table .thead {
+            display: table-header-group;
+            background-color: #f2f2f2;
+        }
+        .table .tbody {
+            display: table-row-group;
+        }
+        .table .tr {
+            display: table-row;
+        }
+        .table .th, .table .td {
+            display: table-cell;
+            border: 1px solid black;
+            padding: 8px;
+        }
+        .table .th {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>Departments</h1>
+<div>
+    <button id="btnCollectDepartInfo">학과 정보 조회하기.</button>
+</div>
+<div class="table">
+    <div class="thead">
+        <div class="tr">
+            <div class="th">학교명</div>
+            <div class="th">학과명</div>
+            <div class="th">일반 / 전문 구분</div>
+            <div class="th"> 주야 구분</div>
+            <div class="th">표준 분류</div>
+        </div>
+    </div>
+        <div class="tr">
+            <div class="td" id="departData"></div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성적 입력</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+          rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/table.css"/>
+    <link href="/css/mainForm/board.css" rel="stylesheet">
+    <link href="/css/mainForm/style.css" rel="stylesheet">
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        const ssUserId = [[${session.SS_USER_ID}]];
+
+        console.log(ssUserId);
+        if(!ssUserId) {
+            console.log("일로 들어옴. ")
+            alert("로그인 후 이용 가능합니다.");
+            window.location.href = "/main";
+        }
+
+
+
+    </script>
+
+</head>
+<body>
+
+<header id="header" class="header fixed-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+
+        <a href="../board/index.html" class="logo d-flex align-items-center">
+            <img src="/images/img/logo.png" alt="">
+            <span>GradeAdvisor</span>
+        </a>
+
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a class="nav-link scrollto" href="#hero">홈</a></li>
+                <li><a class="nav-link scrollto" href="user/myPage">마이 페이지</a></li>
+                <li><a class="nav-link scrollto" href="/board/mainBoard">게시판</a></li>
+                <li><a class="nav-link scrollto" href="/depart/getDepart">학과 정보</a></li>
+                <li><a class="active" href="/grade/gradeInput">성적 입력</a></li>
+                <li><a class="nav-link scrollto" href="#hero">합격률 예측</a></li>
+
+
+                <li th:unless="${nickNameCheck}">
+                    <a class="getstarted scrollto" href="/user/login">로그인</a>
+                </li>
+                <li th:if="${nickNameCheck}">
+                    <a class="getstarted scrollto" id="logout"> 로그아웃</a>
+                </li>
+            </ul>
+            <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
+
+    </div>
+</header><!-- End Header -->
+
+<main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section class="breadcrumbs">
+        <div class="container">
+
+            <ol>
+                <li><a href="/main/">홈</a></li>
+                <li>성적 입력</li>
+            </ol>
+            <h2>성적 입력</h2>
+
+        </div>
+    </section>
+</main>
+<div class="container mt-5">
+    <h2 class="mb-4">수능/모의고사 성적 입력</h2>
+    <form>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>영역 구분</th>
+                <th>과목선택</th>
+                <th>원점수</th>
+                <th>표준점수</th>
+                <th>백분위</th>
+                <th>등급</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>국어영역</td>
+                <td>
+                    <select class="form-control" name="korean">
+                        <option value="">선택</option>
+                        <option value="hwajang">화작</option>
+                        <option value="anmae">언매</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control" name="korean_score"></td>
+                <td><input type="number" class="form-control" name="korean_standard_score"></td>
+                <td><input type="number" class="form-control" name="korean_percentile"></td>
+                <td><input type="number" class="form-control" name="korean_grade"></td>
+            </tr>
+            <tr>
+                <td>수학영역</td>
+                <td>
+                    <select class="form-control" name="math">
+                        <option value="">선택</option>
+                        <option value="statistics">확통</option>
+                        <option value="calculus">미적</option>
+                        <option value="geometry">기하</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control" name="math_score"></td>
+                <td><input type="number" class="form-control" name="math_standard_score"></td>
+                <td><input type="number" class="form-control" name="math_percentile"></td>
+                <td><input type="number" class="form-control" name="math_grade"></td>
+            </tr>
+            <tr>
+                <td>영어영역</td>
+                <td>영어</td>
+                <td><input type="number" class="form-control" name="english_score"></td>
+                <td><input type="number" class="form-control" name="english_standard_score"></td>
+                <td><input type="number" class="form-control" name="english_percentile"></td>
+                <td><input type="number" class="form-control" name="english_grade"></td>
+            </tr>
+            <tr>
+                <td>한국사</td>
+                <td>한국사</td>
+                <td><input type="number" class="form-control" name="history_score"></td>
+                <td><input type="number" class="form-control" name="history_standard_score"></td>
+                <td><input type="number" class="form-control" name="history_percentile"></td>
+                <td><input type="number" class="form-control" name="history_grade"></td>
+            </tr>
+            <tr>
+                <td>탐구</td>
+                <td>
+                    <select class="form-control" name="inquiry">
+                        <option value="">선택</option>
+                        <!-- 사회 -->
+                        <option value="economics">경제</option>
+                        <option value="east_asia_history">동아시아사</option>
+                        <option value="politics_and_law">정치와 법</option>
+                        <option value="social_and_culture">사회 문화</option>
+                        <option value="ethics_and_life">생활과 윤리</option>
+                        <option value="world_history">세계사</option>
+                        <option value="world_geography">세계 지리</option>
+                        <option value="ethics_and_ideas">윤리와 사상</option>
+                        <option value="korean_geography">한국지리</option>
+                        <!-- 과학 -->
+                        <option value="physics_1">물리 1</option>
+                        <option value="biology_1">생명과학 1</option>
+                        <option value="chemistry_1">화학 1</option>
+                        <option value="physics_2">물리 2</option>
+                        <option value="biology_2">생명과학 2</option>
+                        <option value="chemistry_2">화학 2</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control" name="inquiry_score"></td>
+                <td><input type="number" class="form-control" name="inquiry_standard_score"></td>
+                <td><input type="number" class="form-control" name="inquiry_percentile"></td>
+                <td><input type="number" class="form-control" name="inquiry_grade"></td>
+            </tr>
+            <tr>
+                <td>제2외국어</td>
+                <td><input type="text" class="form-control" name="second_foreign_language"></td>
+                <td><input type="number" class="form-control" name="second_foreign_language_score"></td>
+                <td><input type="number" class="form-control" name="second_foreign_language_standard_score"></td>
+                <td><input type="number" class="form-control" name="second_foreign_language_percentile"></td>
+                <td><input type="number" class="form-control" name="second_foreign_language_grade"></td>
+            </tr>
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">저장</button>
+    </form>
+</div>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<div class="container">
+    <div class="copyright">
+        &copy; Copyright <strong><span>FlexStart</span></strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/flexstart-bootstrap-startup-template/ -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+    </div>
+</div>
+</footer><!-- End Footer -->
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+        class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Files -->
+<script src="/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="/vendor/aos/aos.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="/vendor/php-email-form/validate.js"></script>
+
+<!-- Template Main JS File -->
+<script src="/js/mainForm/main.js"></script>
+
+</body>
+</html>

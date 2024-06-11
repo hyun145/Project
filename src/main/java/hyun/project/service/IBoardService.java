@@ -22,5 +22,8 @@ public interface IBoardService {
     List<BoardDTO> boardSearchList(BoardDTO pDTO) throws Exception;
 
 
+    void deleteBoardByUserId(String userId) throws Exception;
+
+    List<BoardDTO> findByBoardByUserId(String userId) throws Exception;
 
 }

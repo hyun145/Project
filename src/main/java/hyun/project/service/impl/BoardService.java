@@ -174,5 +174,38 @@ public class BoardService implements IBoardService {
         return nList;
     }
 
+    @Override
+    public List<BoardDTO> findByBoardByUserId(String userId) throws Exception {
 
+        log.info("작성 게시글 가져오기 서비스 시작");
+
+        List<BoardEntity> rEntity = boardRepository.findAllByUserId(userId);
+
+        List<BoardDTO> rList = new ObjectMapper().convertValue(rEntity,
+                new TypeReference<List<BoardDTO>>() {
+                });
+
+
+        log.info("작성 게시글 가져오기 서비스 종료");
+        return rList;
+    }
+
+    @Override
+    public void deleteBoardByUserId(String userId) throws Exception {
+
+        log.info(this.getClass().getName() +".게시글 삭제 서비스 시작");
+
+        List<BoardEntity> rEntity = boardRepository.findByTitleContaining(userId);
+
+        List<BoardDTO> rList = new ObjectMapper().convertValue(rEntity,
+                new TypeReference<>() {
+                });
+
+        for (BoardDTO bDTO : rList) {
+            boardRepository.deleteById(bDTO.boardSeq());
+        }
+
+        log.info(this.getClass().getName() +".게시글 삭제 서비스 종료");
+
+    }
 }
