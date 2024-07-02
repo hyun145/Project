@@ -33,26 +33,27 @@
         }
 
         $(document).ready(function () {
+
             $("#btnSearch").on("click", function () {
-               let f = document.getElementById("f");
+                let f = document.getElementById("f");
 
-               if (f.keyword.value === "") {
-                   alert("검색어를 입력해주세요.");
-                   f.keyword.focus();
-                   return;
-               }
+                if (f.keyword.value === "") {
+                    alert("검색어를 입력해주세요.");
+                    f.keyword.focus();
+                    return;
+                }
 
-             /*   $.ajax({
-                    url: "/board/boardDelete",
-                    type: "post",
-                    dataType: "JSON",
-                    data: {"nSeq": nSeq},
-                    success:
-                        function (json) {
-                            alert(json.msg);
-                            location.href = "/board/mainBoard?page=1";
-                        }
-                })*/
+                /*   $.ajax({
+                       url: "/board/boardDelete",
+                       type: "post",
+                       dataType: "JSON",
+                       data: {"nSeq": nSeq},
+                       success:
+                           function (json) {
+                               alert(json.msg);
+                               location.href = "/board/mainBoard?page=1";
+                           }
+                   })*/
 
             })
             $("#logout").on("click", function () {
@@ -65,22 +66,58 @@
             $.ajax({
                 type: "post",
                 url: "/user/logout",
-                success: function(json) {
-                    if(json.result = 1) {
-                    alert(json.msg);
-                    window.location.reload();
+                success: function (json) {
+                    if (json.result = 1) {
+                        alert(json.msg);
+                        window.location.reload();
                     }
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log(error);
                     alert("로그아웃 실패");
                 }
             })
         }
 
+        function navigate(page) {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('page', page);
+            window.location.search = urlParams.toString();
+        }
 
     </script>
 
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination-list {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            gap: 5px;
+        }
+
+        .pagination-list a {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .pagination-list a.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .pagination-list a:hover {
+            background-color: #ddd;
+        }
+    </style>
 
 </head>
 
@@ -104,12 +141,12 @@
                 <li><a class="active" href="/board/mainBoard">게시판</a></li>
                 <li><a class="nav-link scrollto" href="/depart/getDepart">학과 정보</a></li>
                 <li><a class="nav-link scrollto" href="/grade/gradeInput">성적 입력</a></li>
-                <li><a class="nav-link scrollto" >합격률 예측</a></li>
+                <li><a class="nav-link scrollto" href="/grade/gradeRes">합격률 예측</a></li>
                 <li th:unless="${nickNameCheck}">
                     <a class="getstarted scrollto" href="/user/login">로그인</a>
                 </li>
                 <li th:if="${nickNameCheck}">
-                        <a class="getstarted scrollto" id="logout"> 로그아웃</a>
+                    <a class="getstarted scrollto" id="logout"> 로그아웃</a>
                 </li>
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>
@@ -126,7 +163,7 @@
         <div class="container">
 
             <ol>
-                <li><a href="/만들어야됨.">홈</a></li>
+                <li><a href="/main">홈</a></li>
                 <li><a>게시판</a></li>
             </ol>
             <h2>게시판</h2>
@@ -143,51 +180,51 @@
 <footer id="footer" class="footer">
     <div class="footer-newsletter">
         <div class="container">
-              <!--  <div class="col-lg-6 text-center">
-                    <form id="f" action="/bootStrap/searchBoard">
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control"  id="keyword" name="keyword" style="width: 50%">
-                            <button class="btn btn-outline-secondary" type="button" id="btnSearch" name="btnSearch">검색</button>
+
+            <!--  <div class="footer-newsletter">
+                  <form action="/board/searchBoard" method="get">
+                      <input type="text" name="keyword" th:value="${keyword}" placeholder="Search..."/>
+                      <button type="submit">Search</button>
+                  </form>-->
+
+            <div id="board-search">
+                <div class="search-window">
+                    <form action="/board/searchBoard" method="get">
+                        <div class="search-wrap">
+                            <input type="text" name="keyword" th:value="${keyword}"  placeholder="제목 입력"/>
+                            <button class="btn btn-dark">검색</button>
                         </div>
                     </form>
-                </div>-->
-                <div class="footer-newsletter">
-                    <form class="form-wrapper cf" id="f" action="/board/searchBoard" method="get">
-                        <input type="text" id="keyword" name="keyword">
-                        <button type="submit" id="btnSearch" >검색</button>
-                    </form>
                 </div>
+            </div>
 
-                <div th:if = "${nickNameCheck}">
-                        <button onclick= location.href="/board/boardReg" class="btn btn-secondary">글쓰기</button>
-                        <button onclick = location.href="/user/myPage" class="btn btn-secondary">마이페이지</button>
-                </div>
+            <div th:if="${nickNameCheck}">
+                <button onclick="location.href='/board/boardReg'" class="btn btn-secondary">글쓰기</button>
+                <button onclick="location.href='/user/myPage'" class="btn btn-secondary">마이페이지</button>
+            </div>
 
 
             <div id="board-list">
                 <div class="container">
-                    <table class="board-table" id="listTable">
-                        <thead>
-                        <tr>
-                            <th scope="col" class="th-title">제목</th>
-                            <th scope="col" class="th-nickName">닉네임</th>
-                            <th scope="col" class="th-date">등록일</th>
-                            <th scope="col" class="th-cnt">조회수</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr class="text-center" th:each="dto : ${rList}">
-                            <td th:text="${dto.title}" th:onclick="doDetail([[${dto.boardSeq}]])"></td>
-                            <td th:text="${dto.nickName}"></td>
-                            <td th:text="${dto.regDt}"></td>
-                            <td th:text="${dto.readCnt}"></td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div class="board-div">
+                        <div class="board-row board-header">
+                            <div class="board-cell th-title">제목</div>
+                            <div class="board-cell th-nickName">닉네임</div>
+                            <div class="board-cell th-date">등록일</div>
+                            <div class="board-cell th-cnt">조회수</div>
+                        </div>
+                        <div class="board-row" th:each="dto : ${rList}">
+                            <div class="board-cell title" th:text="${dto.title()}"
+                                 th:onclick="doDetail([[${dto.boardSeq}]])"></div>
+                            <div class="board-cell nickName" th:text="${dto.nickName()}"></div>
+                            <div class="board-cell date" th:text="${dto.regDt()}"></div>
+                            <div class="board-cell cnt" th:text="${dto.readCnt()}"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- 페이지 번호를 표시하는 부분 -->
-            <div style="display: flex; display: block; margin-left: 40%">
+            <div style="display: flex; display: block;">
                 <div class="pagination">
                     <ul class="pagination pagination-primary" id="pagination">
                         <li class="page-item">
@@ -199,7 +236,8 @@
                                th:href="@{/board/mainBoard(page=${currentPage - 1})}">&lt;</a>
                         </li>
                         <!-- 현재 페이지 주변에 페이지 번호 링크 표시 -->
-                        <th:block th:each="pageNumber : ${#numbers.sequence(T(java.lang.Math).max(1, currentPage - 5), T(java.lang.Math).min(totalPages, currentPage + 5))}">
+                        <th:block
+                                th:each="pageNumber : ${#numbers.sequence(T(java.lang.Math).max(1, currentPage - 5), T(java.lang.Math).min(totalPages, currentPage + 5))}">
                             <li class="page-item"
                                 th:class="${pageNumber == currentPage ? 'active' : ''}">
                                 <a class="page-link" th:href="@{/board/mainBoard(page=${pageNumber})}"
@@ -218,78 +256,13 @@
                 </div>
             </div>
 
+
         </div>
 
 
     </div>
 
-    <div class="footer-top">
-        <div class="container">
-            <div class="row gy-4">
-                <div class="col-lg-5 col-md-12 footer-info">
-                    <a href="index.html" class="logo d-flex align-items-center">
-                        <img src="/images/img/logo.png" alt="">
-                        <span>FlexStart</span>
-                    </a>
-                    <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita
-                        valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
-                    <div class="social-links mt-3">
-                        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-                    </div>
-                </div>
 
-                <div class="col-lg-2 col-6 footer-links">
-                    <h4>Useful Links</h4>
-                    <ul>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Home</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">About us</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Services</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Terms of service</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Privacy policy</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-2 col-6 footer-links">
-                    <h4>Our Services</h4>
-                    <ul>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Web Design</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Web Development</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Product Management</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Marketing</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">Graphic Design</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
-                    <h4>Contact Us</h4>
-                    <p>
-                        A108 Adam Street <br>
-                        New York, NY 535022<br>
-                        United States <br><br>
-                        <strong>Phone:</strong> +1 5589 55488 55<br>
-                        <strong>Email:</strong> info@example.com<br>
-                    </p>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="copyright">
-            &copy; Copyright <strong><span>FlexStart</span></strong>. All Rights Reserved
-        </div>
-        <div class="credits">
-            <!-- All the links in the footer should remain intact. -->
-            <!-- You can delete the links only if you purchased the pro version. -->
-            <!-- Licensing information: https://bootstrapmade.com/license/ -->
-            <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/flexstart-bootstrap-startup-template/ -->
-            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-        </div>
     </div>
 </footer><!-- End Footer -->
 

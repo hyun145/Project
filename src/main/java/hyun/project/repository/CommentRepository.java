@@ -17,5 +17,6 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     List<CommentEntity> findAllByBoardSeq(Long noticeSeq);
 
 
+    void deleteByNickName(String nickName);
 
 }

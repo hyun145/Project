@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.XML;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -17,6 +20,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Slf4j
 @Service
@@ -113,7 +117,7 @@ public class DepartService implements IDepartService {
     public List<String> getSchoolId() throws Exception {
         log.info("학교 아이디 찾기 시작");
         List<String> schoolIds = new ArrayList<>();
-        for (int i= 0; i<= 2; i ++) {
+        for (int i= 2001; i<= 3000; i ++) {
             String schoolId = String.format("%07d", i);
             StringBuilder urlBuilder = new StringBuilder("http://openapi.academyinfo.go.kr/openapi/service/rest/BasicInformationService/getUniversityMajorCode"); /*URL*/
             urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + apiKey); /*Service Key*/
@@ -239,6 +243,8 @@ public class DepartService implements IDepartService {
 
         for (String schId : schIds) {
             List<DepartDTO> departs = getDepartmentsBySchoolId(schId);
+
+            log.info("departs : " + departs);
             rList.addAll(departs);
         }
 
@@ -265,19 +271,22 @@ public class DepartService implements IDepartService {
     }
 
     @Override
-    public List<DepartDTO> getDepartInfoList() throws Exception {
-
+    public Page<DepartDTO> getDepartInfoList(Pageable page, String query) throws Exception {
         log.info(this.getClass().getName() +"학과 정보 조회 서비스 시작 ");
 
         String colNm = "DepartInfo";
-        List<DepartDTO> rList = departMapper.getDepartInfo(colNm);
+        List<DepartDTO> rList = departMapper.getDepartInfo(colNm, query);
+
+        int start = (int) page.getOffset();
+        int end = Math.min((start + page.getPageSize()), rList.size());
+        Page<DepartDTO> rListPage = new PageImpl<>(rList.subList(start, end), page, rList.size());
+
 
 
         log.info(this.getClass().getName() +"학과 정보 조회 서비스 종료 ");
-        return rList;
+        return rListPage;
+
     }
-
-
 }
 
 

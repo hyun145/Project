@@ -2,85 +2,213 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Departments</title>
-    <link rel="stylesheet" href="/css/table.css"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>학과 정보</title>
+
+    <link href="/images/img/favicon.png" rel="icon">
+    <link href="/images/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+          rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="/css/depart.css" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="/css/mainForm/style.css" rel="stylesheet">
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
 
         $(document).ready(function () {
-            $("#btnCollectDepartInfo").on("click", function () {
+
+            loadDepartInfo(0, 20, '');  // 처음 로드할 때 첫 페이지 데이터 가져오기.
+
+            $("#btnSearch").on("click", function () {
+                const query = $("#searchInput").val();
+                loadDepartInfo(0, 20, query);
+            })
+            $("#logout").on("click", function () {
+                logout();
+            })
+
+
+            function loadDepartInfo(page, size, query) {
+
                 $.ajax({
                     url: "/depart/departInfo",
                     type: "post",
+                    data: {page: page, size: size, query: query},
                     dataType: "JSON",
                 }).then(
                     function (json) {
-                        const result = json.data;
+                        $("#departData").empty();
+                        const result = json.data.content;
                         for (const data of result) {
-                            $("#departData").append("<div class=\"divTableRow\">")
-                            $("#departData").append("<div class=\divTableCell\">" + data.korMjrNm + "</div>");
-                            $("#departData").append("<div class=\divTableCell\">" + data.korSchlNm + "</div>");
-                            $("#departData").append("<div class=\divTableCell\">" + data.lsnTrmNm + "</div>");
-                            $("#departData").append("<div class=\divTableCell\">" + data.dghtDivNm + "</div>");
-                            $("#departData").append("<div class=\divTableCell\">" + data.korSrsSclftNm + "</div>");
-                            $("#departData").append("</div>");
-
-
+                            let row = $("<div>").addClass("tr");
+                            row.append($("<div>").addClass("board-cell th-sch").text(data.korSchlNm)); // 학교명
+                            row.append($("<div>").addClass("board-cell th-depart").text(data.korMjrNm)); // 학과명
+                            row.append($("<div>").addClass("board-cell th-lsn").text(data.lsnTrmNm)); // 일반 / 전문 구분
+                            row.append($("<div>").addClass("board-cell th-dgh").text(data.dghtDivNm)); // 주야 구분
+                            row.append($("<div>").addClass("board-cell th-kor").text(data.korSrsSclftNm)); // 표준 분류
+                            $("#departData").append(row);
                         }
 
+
+                        $("#pagination").empty();
+                        const totalPages = json.data.totalPages;
+                        const currentPage = json.data.number;
+                        const pageGroup = 5;
+                        const startPage = Math.floor(currentPage / pageGroup) * pageGroup;
+                        const endPage = Math.min(startPage + pageGroup, totalPages);
+
+                        if (startPage > 0) {
+                            $("#pagination").append($("<button>").addClass("page-btn").text("<<").on("click", function () {
+                                loadDepartInfo(0, size, query);
+                            }));
+                            $("#pagination").append($("<button>").addClass("page-btn").text("<").on("click", function () {
+                                loadDepartInfo(startPage - 1, size, query);
+                            }));
+                        }
+                        for (let i = startPage; i < endPage; i++) {
+                            let pageButton = $("<button>").addClass("page-btn").text(i + 1);
+                            if (i === currentPage) {
+                                pageButton.addClass("active");
+                            }
+                            pageButton.on("click", function () {
+                                loadDepartInfo(i, size, query);
+                            });
+                            $("#pagination").append(pageButton);
+                        }
+                        if (endPage < totalPages) {
+                            $("#pagination").append($("<button>").addClass("page-btn").text(">").on("click", function () {
+                                loadDepartInfo(endPage, size, query);
+                            }));
+                            $("#pagination").append($("<button>").addClass("page-btn").text(">>").on("click", function () {
+                                loadDepartInfo(totalPages - 1, size, query);
+                            }));
+                        }
                     }
-                )
+                );
+            }
 
+        });
+
+        function logout() {
+            $.ajax({
+                type: "post",
+                url: "/user/logout",
+                success: function (json) {
+                    if (json.result = 1) {
+                        alert(json.msg);
+                        window.location.reload();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert("로그아웃 실패");
+                }
             })
+        }
 
-        })
 
     </script>
-    <style>
-        .table {
-            display: table;
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-        .table .thead {
-            display: table-header-group;
-            background-color: #f2f2f2;
-        }
-        .table .tbody {
-            display: table-row-group;
-        }
-        .table .tr {
-            display: table-row;
-        }
-        .table .th, .table .td {
-            display: table-cell;
-            border: 1px solid black;
-            padding: 8px;
-        }
-        .table .th {
-            font-weight: bold;
-        }
-    </style>
+
+
 </head>
 <body>
-<h1>Departments</h1>
-<div>
-    <button id="btnCollectDepartInfo">학과 정보 조회하기.</button>
-</div>
-<div class="table">
-    <div class="thead">
-        <div class="tr">
-            <div class="th">학교명</div>
-            <div class="th">학과명</div>
-            <div class="th">일반 / 전문 구분</div>
-            <div class="th"> 주야 구분</div>
-            <div class="th">표준 분류</div>
-        </div>
-    </div>
-        <div class="tr">
-            <div class="td" id="departData"></div>
+<header id="header" class="header fixed-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+
+        <a href="/main" class="logo d-flex align-items-center">
+            <img src="/images/img/logo.png" alt="">
+            <span>GradeAdvisor</span>
+        </a>
+
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a class="nav-link scrollto" href="/main">홈</a></li>
+                <li><a class="nav-link scrollto" href="../user/myPage">마이 페이지</a></li>
+                <li><a class="nav-link scrollto" href="/board/mainBoard">게시판</a></li>
+                <li><a class="active" href="/depart/getDepart">학과 정보</a></li>
+                <li><a class="nav-link scrollto" href="/grade/gradeInput">성적 입력</a></li>
+                <li><a class="nav-link scrollto" href="/grade/gradeRes">합격률 예측</a></li>
+
+
+                <li th:unless="${globalSession}">
+                    <a class="getstarted scrollto" href="/user/login">로그인</a>
+                </li>
+                <li th:if="${globalSession}">
+                    <a class="getstarted scrollto" id="logout"> 로그아웃</a>
+                </li>
+            </ul>
+            <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
 
     </div>
-</div>
+</header><!-- End Header -->
+
+<main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <section class="breadcrumbs">
+        <div class="container">
+
+            <ol>
+                <li><a href="/main">홈</a></li>
+                <li>학과 정보 조회</li>
+            </ol>
+            <h2>학과 정보 조회</h2>
+
+        </div>
+    </section>
+</main>
+<footer id="footer" class="footer">
+    <div class="footer-newsletter">
+        <div class="container">
+            <div id="board-search">
+                <div class="search-window">
+                    <div class="search-wrap">
+                        <input type="text" id="searchInput" placeholder="검색어 입력"/>
+                        <button id="btnSearch" class="btn btn-dark">검색</button>
+                    </div>
+                </div>
+            </div>
+            <div class="board-list">
+                <div class="container">
+                    <div class="board-div">
+                        <div class="board-cell th-sch" scope="col">학교명</div>
+                        <div class="board-cell th-depart" scope="col">학과명</div>
+                        <div class="board-cell th-lsn" scope="col">일반 / 전문 구분</div>
+                        <div class="board-cell th-dgh" scope="col">주야 구분</div>
+                        <div class="board-cell th-kor" scope="col">표준 분류</div>
+                    </div>
+                </div>
+                <div class="board-row">
+                    <div class="tbody text-center" id="departData"></div>
+                </div>
+            </div>
+            <div id="pagination"></div>
+        </div>
+
+    </div>
+
+</footer><!-- End Footer -->
+
+<!-- Vendor JS Files -->
+<script src="/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="/vendor/aos/aos.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="/vendor/php-email-form/validate.js"></script>
+
+<!-- Template Main JS File -->
+<script src="/js/mainForm/main.js"></script>
 </body>
 </html>

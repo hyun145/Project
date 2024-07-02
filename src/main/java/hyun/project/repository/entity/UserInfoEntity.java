@@ -39,7 +39,6 @@ public class UserInfoEntity implements Serializable {
     private String email;
 
 
-    @NonNull
     @Column(name = "NICKNAME", length = 500, nullable = false)
     private String nickName;
 

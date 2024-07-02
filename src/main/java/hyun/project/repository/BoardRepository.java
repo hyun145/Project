@@ -2,6 +2,8 @@ package hyun.project.repository;
 
 
 import hyun.project.repository.entity.BoardEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,10 +24,11 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
 
     BoardEntity findByBoardSeq(Long boardSeq);
 
-    List<BoardEntity> findAllByUserId(String userId);
+    Page<BoardEntity> findAllByUserId(String userId, Pageable page);
+
+    List<BoardEntity> findAllByTitleContaining(String keyWord);
 
     List<BoardEntity> findByTitleContaining(String keyWord);
-
 
 
 

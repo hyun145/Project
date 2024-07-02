@@ -58,4 +58,5 @@ public class BoardEntity {
     @Column(name = "FILE_YN")
     private String fileYn;
 
+
 }

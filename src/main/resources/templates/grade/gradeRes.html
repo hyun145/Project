@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>성적 입력</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+          rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/table.css"/>
+    <link href="/css/mainForm/board.css" rel="stylesheet">
+    <link href="/css/mainForm/style.css" rel="stylesheet">
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        const ssUserId = [[${session.SS_USER_ID}]];
+
+        console.log(ssUserId);
+        if (!ssUserId) {
+            console.log("일로 들어옴. ")
+            alert("로그인 후 이용 가능합니다.");
+            window.location.href = "/main";
+        }
+    </script>
+    <script>
+        const departments = {
+            '폴리텍 강서 캠퍼스': [
+                { value: '빅데이터과', text: '빅데이터과' },
+                { value: '사이버보안과', text: '사이버보안과' },
+                { value: '패션디자인과', text: '패션디자인과' },
+                { value: '디지털콘텐츠과', text: '디지털콘텐츠과' },
+                { value: '주얼리디자인과', text: '주얼리디자인과' },
+                { value: '의료정보과', text: '의료정보과' }
+            ],
+            '폴리텍 정수 캠퍼스': [
+                { value: '그린에너지설비과', text: '그린에너지설비과' },
+                { value: '기계시스템디자인과', text: '기계시스템디자인과' },
+                { value: '미래형자동차과', text: '미래형자동차과' },
+                { value: '스마트정보통신과', text: '스마트정보통신과' },
+                { value: '시각디자인과', text: '시각디자인과' },
+                { value: '인공지능소프트웨어과', text: '인공지능소프트웨어과' },
+                { value: '전기과', text: '전기과' }
+            ]
+        };
+
+        $(document).ready(function () {
+            $("#logout").on("click", function () {
+                logout();
+            })
+
+            $('#choice_UNI_2').change(function () {
+                updateMajors();
+            });
+
+
+            hideMajors();
+            $("#btnSubmit").on("click", function () {
+
+                btnSubmit();
+
+            });
+        });
+
+        function btnSubmit() {
+            const selectedUniversity = $('#choice_UNI_2').val();
+            const selectedMajor = $('#choice_MJR_2').val();
+            console.log("Selected University: " + selectedUniversity);
+            console.log("Selected Major: " + selectedMajor);
+
+            $.ajax({
+                url: '/grade/gradeResponse',
+                method: 'GET',
+                data: {
+                    university: selectedUniversity,
+                    major: selectedMajor
+                },
+                success: function (response) {
+                    $("#result").html("합격률 : " + response.toFixed(2) + "%");
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert("예측 실패");
+                }
+            });
+
+        }
+
+        function logout() {
+            $.ajax({
+                type: "post",
+                url: "/user/logout",
+                success: function (json) {
+                    if (json.result = 1) {
+                        alert(json.msg);
+                        window.location.reload();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert("로그아웃 실패");
+                }
+            })
+        }
+
+
+        function updateMajors() {
+            const selectedUniversity = $('#choice_UNI_2').val();
+            const majorSelect = $('#choice_MJR_2');
+
+            majorSelect.empty();
+            majorSelect.append('<option value="">-- 학과 선택 --</option>');
+
+            if (departments[selectedUniversity]) {
+                departments[selectedUniversity].forEach(function (department) {
+                    majorSelect.append(`<option value="${department.value}">${department.text}</option>`);
+                });
+            }
+        }
+        function showMajors() {
+            var majors = document.querySelectorAll('#choice_MJR_2 .major');
+            majors.forEach(function (major) {
+                major.classList.remove('hidden');
+            });
+        }
+
+        function hideMajors() {
+            var majors = document.querySelectorAll('#choice_MJR_2 .major');
+            majors.forEach(function (major) {
+                major.classList.add('hidden');
+            });
+        }
+    </script>
+
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        .centered-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            color: #007bff;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .choice-uni-border {
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #f1f1f1;
+        }
+
+        .choice-uni, .choice-mjr {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .section-header {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .section-header h3, .section-header h5 {
+            margin: 0;
+        }
+
+        .info-banner {
+            background-color: #007bff;
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .info-banner h5, .info-banner h3 {
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<header id="header" class="header fixed-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+        <a href="/main" class="logo d-flex align-items-center">
+            <img src="/images/img/logo.png" alt="">
+            <span>GradeAdvisor</span>
+        </a>
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a class="nav-link scrollto" href="/main">홈</a></li>
+                <li><a class="nav-link scrollto" href="/user/myPage">마이 페이지</a></li>
+                <li><a class="nav-link scrollto" href="/board/mainBoard">게시판</a></li>
+                <li><a class="nav-link scrollto" href="/depart/getDepart">학과 정보</a></li>
+                <li><a class="nav-link scrollto" href="/grade/gradeInput">성적 입력</a></li>
+                <li><a class="active" href="/grade/gradeRes">합격률 예측</a></li>
+                <li th:unless="${globalSession}">
+                    <a class="getstarted scrollto" href="/user/login">로그인</a>
+                </li>
+                <li th:if="${globalSession}">
+                    <a class="getstarted scrollto" id="logout"> 로그아웃</a>
+                </li>
+            </ul>
+            <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
+    </div>
+</header><!-- End Header -->
+
+<main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <section class="breadcrumbs">
+        <div class="container">
+            <ol>
+                <li><a href="/main">홈</a></li>
+                <li>합격률 예측</li>
+            </ol>
+            <h2>합격률 예측</h2>
+        </div>
+    </section>
+</main>
+<footer id="footer" class="footer">
+    <form id="addmissionForm">
+        <div class="info-banner">
+            <h5>기준은 2023년도 입시 결과이며 선택한 학교의 학과별 평균 등급컷으로 계산하였습니다.</h5>
+            <h3>결과는 그냥 참고만 하시길 바랍니다.</h3>
+        </div>
+        <div class="container centered-form">
+
+            <div class="col-lg-6 col-md-8 p-4">
+                <div class="choice-uni-border text-center">
+                    <div class="row align-items-stretch mb-4">
+                        <label for="choice_UNI_2" class="form-label"><strong>대학교-II</strong></label>
+                        <select class="choice-uni" id="choice_UNI_2" onchange="updateMajors()">
+                            <option value="">-- 대학 선택 --</option>
+                            <option value="폴리텍 강서 캠퍼스">폴리텍 강서 캠퍼스</option>
+                            <option value="폴리텍 정수 캠퍼스">폴리텍 정수 캠퍼스</option>
+                        </select>
+                    </div>
+                    <div class="row align-items-stretch mb-4">
+                        <label for="choice_MJR_2" class="form-label"><strong>지원학과-II</strong></label>
+                        <select class="choice-mjr" id="choice_MJR_2">
+                            <option value="">-- 학과 선택 --</option>
+                        </select>
+                    </div>
+                    <div class="row align-items-stretch mb-4">
+                        <button type="button" id="btnSubmit" class="btn btn-outline-primary">합격률 예측</button>
+                    </div>
+                </div>
+                <div class="row align-items-stretch mb-4">
+                    <div id="result" class="col-12"></div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+
+
+</footer>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="/vendor/aos/aos.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+<script src="/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="/vendor/php-email-form/validate.js"></script>
+<script src="/js/mainForm/main.js"></script>
+
+</body>
+</html>

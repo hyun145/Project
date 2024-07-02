@@ -6,15 +6,15 @@ import hyun.project.dto.DepartDTO;
 import hyun.project.service.IDepartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 
 @Slf4j
@@ -32,21 +32,19 @@ public class DepartController {
      * 조회 하면 됨 .
      */
     @PostMapping(value = "departInfo")
-    public ResponseEntity collectDepartInfo() throws Exception {
+    public ResponseEntity collectDepartInfo(ModelMap model,
+                                            @RequestParam(defaultValue = "0")int page,
+                                            @RequestParam(defaultValue = "20")int size,
+                                            @RequestParam(required = false)String query) throws Exception {
 
         log.info("몽고디비 리스트 조회 컨트롤러 시작 ");
 
-        List<DepartDTO> rList;
-        int res = departService.collectDepartInfo();
 
-        if (res == 1) {
+        Page<DepartDTO> rList = departService.getDepartInfoList(PageRequest.of(page, size), query);
 
-        rList = Optional.ofNullable(departService.getDepartInfoTest())
-                .orElseGet(ArrayList::new);
-        } else {
-            rList = new ArrayList<>();
-        }
+//        departService.collectDepartInfo();
 
+        model.addAttribute("rList", rList.getContent());
 
 
         log.info("몽고디비 리스트 조회 컨트롤러 종료 ");

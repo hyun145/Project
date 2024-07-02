@@ -248,7 +248,6 @@ public class UserInfoService implements IUserInfoService {
             rDTO =  new ObjectMapper().convertValue(pEntity, UserInfoDTO.class);
 
 
-
         } else {
             rDTO = UserInfoDTO.builder().build();
         }

@@ -13,7 +13,7 @@ public interface IDepartMapper {
     int insertDepartInfo(List<DepartDTO> pList,String colNm) throws Exception;
 
 
-    List<DepartDTO> getDepartInfo(String colNm) throws Exception;
+    List<DepartDTO> getDepartInfo(String colNm, String query) throws Exception;
 
 
 

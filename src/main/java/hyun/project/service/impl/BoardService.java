@@ -11,6 +11,8 @@ import hyun.project.util.CmmUtil;
 import hyun.project.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class BoardService implements IBoardService {
     // noticeRepository 변수에 이미 메모리에 올라간 NoticeRepository 객체를 넣어줌
     // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
     private final BoardRepository boardRepository;
+
 
     @Override
     public List<BoardDTO> getBoardList() {
@@ -71,7 +74,6 @@ public class BoardService implements IBoardService {
         return rDTO;
     }
 
-    @Transactional
     @Override
     public int updateBoardInfo(BoardDTO pDTO) {
 
@@ -155,39 +157,16 @@ public class BoardService implements IBoardService {
 
     }
 
-    @Override
-    public List<BoardDTO> boardSearchList(BoardDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() +".boardSearchList Start!");
-        String keyWord = CmmUtil.nvl(pDTO.title());
-
-
-        List<BoardEntity> rEntity = boardRepository.findByTitleContaining(keyWord);
-
-
-        // 엔티티의 값들을 DTO에 맞게 넣어주기
-        List<BoardDTO> nList = new ObjectMapper().convertValue(rEntity,
-                new TypeReference<>() {
-                });
-
-        log.info(this.getClass().getName() +".boardSearchList End!");
-        return nList;
-    }
 
     @Override
-    public List<BoardDTO> findByBoardByUserId(String userId) throws Exception {
+    public Page<BoardEntity> findByBoardByUserId(String userId, Pageable page) throws Exception {
 
         log.info("작성 게시글 가져오기 서비스 시작");
 
-        List<BoardEntity> rEntity = boardRepository.findAllByUserId(userId);
-
-        List<BoardDTO> rList = new ObjectMapper().convertValue(rEntity,
-                new TypeReference<List<BoardDTO>>() {
-                });
-
 
         log.info("작성 게시글 가져오기 서비스 종료");
-        return rList;
+        return boardRepository.findAllByUserId(userId, page);
     }
 
     @Override
@@ -195,7 +174,7 @@ public class BoardService implements IBoardService {
 
         log.info(this.getClass().getName() +".게시글 삭제 서비스 시작");
 
-        List<BoardEntity> rEntity = boardRepository.findByTitleContaining(userId);
+        List<BoardEntity> rEntity = boardRepository.findAllByTitleContaining(userId);
 
         List<BoardDTO> rList = new ObjectMapper().convertValue(rEntity,
                 new TypeReference<>() {
@@ -208,4 +187,22 @@ public class BoardService implements IBoardService {
         log.info(this.getClass().getName() +".게시글 삭제 서비스 종료");
 
     }
+        @Override
+        public List<BoardDTO> boardSearchList(BoardDTO pDTO) throws Exception {
+
+            log.info(this.getClass().getName() +".boardSearchList Start!");
+            String keyWord = CmmUtil.nvl(pDTO.title());
+
+
+            List<BoardEntity> rEntity = boardRepository.findByTitleContaining(keyWord);
+
+
+            // 엔티티의 값들을 DTO에 맞게 넣어주기
+            List<BoardDTO> nList = new ObjectMapper().convertValue(rEntity,
+                    new TypeReference<>() {
+                    });
+
+            log.info(this.getClass().getName() +".boardSearchList End!");
+            return nList;
+        }
 }

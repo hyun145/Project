@@ -47,6 +47,18 @@ public class CommentService implements ICommentService {
     }
 
     @Override
+    @Transactional
+    public void deleteComment(String nickName) {
+        log.info("댓글 삭제 서비스 시작");
+
+
+        commentRepository.deleteByNickName(nickName);
+
+
+        log.info("댓글 삭제 서비스 종료");
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void insertComment(Long boardSeq, String nickName, String comment) throws Exception {
 

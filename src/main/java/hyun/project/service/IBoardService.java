@@ -1,6 +1,9 @@
 package hyun.project.service;
 
 import hyun.project.dto.BoardDTO;
+import hyun.project.repository.entity.BoardEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,11 +22,11 @@ public interface IBoardService {
 
     Long insertBoardInfo(BoardDTO pDTO) throws Exception;     // 저장
 
-    List<BoardDTO> boardSearchList(BoardDTO pDTO) throws Exception;
 
+    List<BoardDTO> boardSearchList(BoardDTO pDTO) throws Exception;
 
     void deleteBoardByUserId(String userId) throws Exception;
 
-    List<BoardDTO> findByBoardByUserId(String userId) throws Exception;
+    Page<BoardEntity> findByBoardByUserId(String userId, Pageable page) throws Exception;
 
 }

@@ -1,10 +1,11 @@
 package hyun.project.controller;
 
 
-import hyun.project.dto.BoardDTO;
 import hyun.project.dto.MsgDTO;
 import hyun.project.dto.UserInfoDTO;
+import hyun.project.repository.entity.BoardEntity;
 import hyun.project.service.IBoardService;
+import hyun.project.service.ICommentService;
 import hyun.project.service.IUserInfoService;
 import hyun.project.util.CmmUtil;
 import hyun.project.util.EncryptUtil;
@@ -12,16 +13,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -32,38 +31,41 @@ public class UserInfoController {
 
     private final IUserInfoService userInfoService;
     private final IBoardService boardService;
+    private final ICommentService commentService;
 
 
     /**
      * 내 정보 수정 페이지
      */
     @GetMapping(value = "myPage")
-    public String myPage(HttpSession session, RedirectAttributes redirectAttributes,
+    public String myPage(@RequestParam(value = "page", defaultValue = "0") int page,
+                         @RequestParam(value = "size", defaultValue = "5") int size,
+                         HttpSession session, RedirectAttributes redirectAttributes,
                          ModelMap model) {
-        log.info(this.getClass().getName() +".마이페이지 Start!");
+        log.info(this.getClass().getName() + ".마이페이지 Start!");
 
-        String ssUserId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+        String ssUserId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
         log.info("ssUserId:" + ssUserId);
 
         try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<BoardEntity> rList = boardService.findByBoardByUserId(ssUserId, pageable);
 
-        List<BoardDTO> rList = Optional.ofNullable(boardService.findByBoardByUserId(ssUserId))
-                .orElseGet(ArrayList::new);
+            model.addAttribute("rList", rList.getContent());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", rList.getTotalPages());
+            model.addAttribute("pageSize", size);  // 페이지 사이즈를 모델에 추가
 
-        model.addAttribute("rList", rList);
 
         } catch (Exception e) {
             log.info(e.toString());
             e.printStackTrace();
         }
 
-
-        log.info(this.getClass().getName() +".마이페이지 End!");
+        log.info(this.getClass().getName() + ".마이페이지 End!");
 
         return "user/myPage";
     }
-
-
 
     @ResponseBody
     @PostMapping(value = "updateUserInfo")
@@ -124,6 +126,11 @@ public class UserInfoController {
 
         log.info("userId : " + userId);
         log.info("rDTO : " + rDTO);
+        String tmp = rDTO.email();
+        log.info(tmp);
+        String email = EncryptUtil.decAES128CBC(tmp);
+        log.info("email : " + email);
+        model.addAttribute("email", email);
         model.addAttribute("rDTO", rDTO);
 
 
@@ -276,6 +283,9 @@ public class UserInfoController {
                 session.setAttribute("SS_USER_ID", CmmUtil.nvl(rDTO.userId()));
 
                 log.info("일로 잘 들어옴.");
+            } else {
+                msg = "아이디가 존재하지 않습니다.";
+                res = 2;
             }
         } catch (Exception e) {
             log.info("catch로 들어옴. ");
@@ -372,7 +382,7 @@ public class UserInfoController {
     public String searchUserId() {
         log.info(this.getClass().getName() +".searchUserId Start!");
         log.info(this.getClass().getName() +".searchUserId End!");
-        return "/user/searchUserId";
+        return "user/searchUserId";
 
     }
 
@@ -438,7 +448,7 @@ public class UserInfoController {
         session.removeAttribute("NEW_PASSSWORD");
 
         log.info(this.getClass().getName() +".searchPassword End!");
-        return "/user/searchPassword";
+        return "user/searchPassword";
     }
 
     /**
@@ -449,25 +459,38 @@ public class UserInfoController {
     public String searchPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
 
         log.info(this.getClass().getName() +".searchPasswordProc Start!");
+        int res = 1;
+        MsgDTO msg;
+
+        try {
 
 
-        String userId = CmmUtil.nvl(request.getParameter("userId"));
+            String userId = CmmUtil.nvl(request.getParameter("userId"));
 
-        String email=  CmmUtil.nvl(request.getParameter("email"));
+            String email=  CmmUtil.nvl(request.getParameter("email"));
 
-        log.info("userId : " + userId);
-        log.info("email : " + email);
+            log.info("userId : " + userId);
+            log.info("email : " + email);
 
-        UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId)
-                        .email(EncryptUtil.encAES128CBC(email)).build();
+            UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId)
+                    .email(EncryptUtil.encAES128CBC(email)).build();
 
-        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.searchPassword(pDTO))
-                        .orElseGet(() -> UserInfoDTO.builder().build());
+            UserInfoDTO rDTO = Optional.ofNullable(userInfoService.searchPassword(pDTO))
+                    .orElseGet(() -> UserInfoDTO.builder().build());
 
 
-        model.addAttribute("rDTO", rDTO);
+            model.addAttribute("rDTO", rDTO);
 
-        session.setAttribute("NEW_PASSWORD", userId);       // userId를 넣어서 비밀번호 재설정하는 newPasswordProc 함수에서 사용하기 위함임.
+            session.setAttribute("NEW_PASSWORD", userId);
+            res = 1;
+            // userId를 넣어서 비밀번호 재설정하는 newPasswordProc 함수에서 사용하기 위함임.
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return "user/login";
+
+        }
+
         log.info(this.getClass().getName() +".searchPasswordProc End!");
 
         return "user/newPassword";
@@ -506,8 +529,9 @@ public class UserInfoController {
         model.addAttribute("msg", msg);
 
         log.info(this.getClass().getName() +".newPasswordProc End!");
-        return "/user/login";
+        return "user/login";
     }
+
 
     /**
      * 마이페이지 비밀번호 재설정
@@ -567,9 +591,15 @@ public class UserInfoController {
 
         String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
 
+        String nickName = CmmUtil.nvl((String) session.getAttribute("SS_NICK_NAME"));
         log.info("세션에 저장 되있는 유저 아이디 : " + userId);
 
+        log.info("세션에 저장되있는 닉네임 : " + nickName);
 
+
+        // 댓글 삭제 .
+
+        commentService.deleteComment(nickName);
         boardService.deleteBoardByUserId(userId);
         userInfoService.deleteUserInfo(userId);
 

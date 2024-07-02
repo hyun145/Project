@@ -72,7 +72,7 @@ public class DepartMapper extends AbstractMongoDBComon implements IDepartMapper 
     }
 
     @Override
-    public List<DepartDTO> getDepartInfo(String colNm) throws Exception {
+    public List<DepartDTO> getDepartInfo(String colNm, String query) throws Exception {
 
         log.info(this.getClass().getName() +".학과 정보 조회 매퍼 시작");
         List<DepartDTO> rList = new LinkedList<>();
@@ -81,7 +81,18 @@ public class DepartMapper extends AbstractMongoDBComon implements IDepartMapper 
         Document projection = new Document();
         projection.append("_id", 0);
 
-        FindIterable<Document> rs = col.find(new Document()).projection(projection);
+        Document filter = new Document();
+        if (query != null && !query.isEmpty()) {
+            filter.append("$or", List.of(
+                    new Document("korMjrNm", new Document("$regex", query).append("$options", "i")),
+                    new Document("korSchlNm", new Document("$regex", query).append("$options", "i")),
+                    new Document("lsnTrmNm", new Document("$regex", query).append("$options", "i")),
+                    new Document("dghtDivNm", new Document("$regex", query).append("$options", "i")),
+                    new Document("korSrsSclftNm", new Document("$regex", query).append("$options", "i"))
+            ));     // 검색어가 있을 시 ,
+        }
+        FindIterable<Document> rs = col.find(filter).projection(projection);
+
 
         for (Document doc : rs) {
             String korMjrNm = CmmUtil.nvl(doc.getString("korMjrNm"));

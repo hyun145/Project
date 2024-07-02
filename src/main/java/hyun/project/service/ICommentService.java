@@ -11,6 +11,7 @@ public interface ICommentService {
 
     List<CommentDTO> getCommentList(CommentDTO pDTO);
 
+    void deleteComment(String nickName);
 
 
     @Transactional(rollbackFor = Exception.class)
