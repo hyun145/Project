@@ -1,10 +1,12 @@
 package hyun.project.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import hyun.project.repository.entity.BoardEntity;
 import lombok.Builder;
 
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record BoardDTO(
         Long boardSeq,
 
@@ -26,14 +28,16 @@ public record BoardDTO(
 
         String nickName,
 
-        String fileYn
+        String fileYn,
+
+        int likeCount   // 좋아요 수
 
 
 
 
 ) {
 
-//    DTO -> Entity
+//    Entity -> DTO
     public static BoardDTO fromEntity(BoardEntity entity) {
         return BoardDTO.builder()
                 .boardSeq(entity.getBoardSeq())
@@ -47,6 +51,7 @@ public record BoardDTO(
                 .chgDt(entity.getChgDt())
                 .nickName(entity.getNickName())
                 .fileYn(entity.getFileYn())
+                .likeCount(entity.getLikeCount())
                 .build();
     }
 }

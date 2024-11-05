@@ -43,6 +43,12 @@
     </script>
     <script type="text/javascript">
 
+        $(document).ready(function () {
+
+            $("#logout").on("click", function () {
+                logout();
+            })
+        })
 
         function doDetail(seq) {
             location.href = "/board/boardInfo?nSeq=" + seq;
@@ -170,7 +176,7 @@
         <div class="col-md-12">
 
             <div>
-                <h3>내 글 관리</h3>
+                <h3 style="text-align: center">내 글 관리</h3>
                 <div class="table">
                     <div class="thead">
                         <div class="tr"> 제목</div>

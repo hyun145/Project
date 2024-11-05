@@ -58,5 +58,13 @@ public class BoardEntity {
     @Column(name = "FILE_YN")
     private String fileYn;
 
+    @Column(name = "LIKE_COUNT")
+    private int likeCount;
+
+    @PrePersist
+    public void prePersist() {
+        this.likeCount = 0;
+    }
+
 
 }

@@ -1,6 +1,7 @@
 package hyun.project.util;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -16,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 
+@Slf4j
 public class EncryptUtil {
 
     /*
@@ -106,7 +108,7 @@ public class EncryptUtil {
      *
      * 128은 암호화 키 길이를 의미함 128비트는 = 16바이트(1바이트=8비트 * 16 = 128)
      */
-    public static String decAES128CBC(String str)
+ /*   public static String decAES128CBC(String str)
             throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 
@@ -117,5 +119,22 @@ public class EncryptUtil {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, newKey, ivSpec);
         return new String(cipher.doFinal(textBytes), "UTF-8");
+    }*/
+    public static String decAES128CBC(String str)
+            throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+
+        log.info("암호화된 이메일: " + str); // 추가된 로그
+        byte[] textBytes = Base64.decodeBase64(str);
+        AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivBytes);
+        SecretKeySpec newKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, newKey, ivSpec);
+
+        String decrypted = new String(cipher.doFinal(textBytes), "UTF-8");
+        log.info("복호화된 결과: " + decrypted); // 복호화된 값을 로그로 출력
+
+        return decrypted;
     }
+
 }

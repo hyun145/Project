@@ -29,15 +29,47 @@
         #post-date {
             margin-left: auto;
         }
+        .like-container {
+            text-align: center; /* 중앙 정렬 */
+            margin-top: 20px; /* 상단 여백 */
+        }
+
+        .like-button {
+            background-color: #007BFF; /* 파란색 배경 */
+            color: #FFFFFF; /* 글자 색상 흰색 */
+            border: none; /* 테두리 없음 */
+            border-radius: 25px; /* 둥근 모서리 */
+            padding: 10px 20px; /* 패딩 조정 */
+            font-size: 18px; /* 글자 크기 */
+            cursor: pointer; /* 커서 모양 변경 */
+            transition: background-color 0.3s, transform 0.2s; /* 부드러운 전환 효과 */
+        }
+
+        .like-button:hover {
+            background-color: #0056b3; /* 마우스 오버 시 색상 변경 (더 짙은 파란색) */
+            transform: scale(1.05); /* 살짝 확대 효과 */
+        }
+
+        .like-count {
+            margin-top: 10px; /* 위쪽 여백 */
+            font-size: 18px; /* 글자 크기 */
+            color: #130202; /* 글자 색상 흰색 */
+        }
+
     </style>
     <script th:inline="javascript">
         /*<![CDATA[*/
         const ssNickName = [[${session.SS_NICK_NAME}]];
+        const ssUserId = [[${session.SS_USER_ID}]];
         const nickName = [[${rDTO.nickName}]];
         const nSeq = [[${rDTO.boardSeq}]];
 
+        const urlParams = new URL(location.href).searchParams;
 
+
+        console.log(nSeq)
         $(document).ready(function () {
+
             $("#logout").on("click", function () {
                 logout();
             })
@@ -52,51 +84,345 @@
                 location.href = "/board/mainBoard";
             })
 
-            $("#btnCommentInsert").on("click", function () {
-                doCommentInsert();
-            });
+            $("#toggle_heart").on("click", function () {
+                toggleHeart();
+            })
+
+
+            getCommentList();
+
+            $("div[id^='updateComment']").hide();
+            $("div[id^='updateRecomment']").hide();
+            $("div[id^='recommentArea']").hide();
+
+
         });
+
+
+        function toggleHeart() {
+            $.ajax({
+                url: "/heart/toggle",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    nSeq: nSeq
+                },
+                success: function (response) {
+                    console.log("AJAX Success:", response);
+                    alert(response.msg);
+                },
+                error: function(xhr, status, error) {
+                    console.log("AJAX Error:", error);
+                }
+            });
+        }
+        function insertComment(dept) {
+
+            if (ssNickName == "") {
+                alert("로그인 후 이용 가능합니다.");
+                return;
+            }
+
+            console.log(document.getElementById("nSeq").value)
+
+            $.ajax({
+                url: "/comment/insertComment",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    'boardSeq': document.getElementById("nSeq").value,
+                    'contents': document.getElementById("commentContents").value,
+                    'dept': dept
+                },
+                success: function (json) {
+                    alert(json.msg)
+                    if (json.result === 1) {
+                        getCommentList()
+
+                        document.getElementById("commentContents").value = ""
+                    }
+                }
+            })
+
+        }
+
+
+        function getCommentList() {
+            console.log(document.getElementById("nSeq").value)
+            $.ajax({
+
+                url: "/comment/getCommentList",
+                type: "post",
+                dataType: "JSON",
+                data: {
+                    "boardSeq": document.getElementById("nSeq").value
+
+                },
+                success: function (json) {
+                    console.log(json);
+                    insertCommentList(json)
+                }
+            });
+        }
+
+        function insertCommentList(json) {
+            let commentList = $("#commentList");
+            commentList.empty();
+
+            json.forEach(function (data) {
+                let row = $("<div>")
+                    .addClass("comment-row")
+                    .css({
+                        "border": "1px solid #ddd",
+                        "padding": "10px",
+                        "margin-bottom": "10px",
+                        "border-radius": "5px"
+                    });
+
+                let td = $("<div>")
+                    .addClass("comment-col")
+                    .css({
+                        width: '100%'
+                    });
+
+                // 작성자와 작성일 표시
+                let strong = $("<strong>").text("작성자 : " + data.nickname);
+                let span = $("<span>")
+                    .css({
+                        "float": "right",
+                        "font-size": "smaller",
+                        "color": "#888"
+                    })
+                    .text("작성일 : " + data.regDt);
+                td.append($("<div>").append(strong, span));
+
+                // 댓글 내용 표시
+                let baseComment = $("<div>")
+                    .attr("id", "baseComment_" + data.commentSeq)
+                    .css({
+                        "margin-top": "10px",
+                        "margin-bottom": "10px"
+                    });
+                let readComment = $("<div>")
+                    .css({
+                        "white-space": "pre-wrap",
+                        "background-color": "#f9f9f9",
+                        "padding": "10px",
+                        "border-radius": "5px",
+                        "border": "1px solid #ddd"
+                    })
+                    .text(data.contents);
+                baseComment.append(readComment);
+
+                if (ssNickName === data.nickname) {
+
+
+                    // 수정/삭제 버튼
+                    let btnShowEditArea = $("<button>")
+                        .addClass("btn btn-outline-secondary btn-sm")
+                        .css("margin-right", "5px")
+                        .text("수정")
+                        .click(function () {
+                            showEditArea(data.commentSeq);
+                        });
+
+                    let btnDoCoDelete = $("<button>")
+                        .addClass("btn btn-outline-danger btn-sm")
+                        .text("삭제")
+                        .click(function () {
+                            doDeleteComment(data.commentSeq);
+                        });
+
+
+                    baseComment.append($("<div>").css("text-align", "right").append(btnShowEditArea, btnDoCoDelete));
+
+                }
+                td.append(baseComment);
+
+                // 업데이트 상태
+                let updateComment = $("<div>")
+                    .attr("id", "updateComment_" + data.commentSeq)
+                    .css("display", "none");
+                // 수정 가능한 댓글
+                let updateTextarea = $("<textarea>")
+                    .attr({
+                        "name": "upComment",
+                        "id": "upComment_" + data.commentSeq,
+                        "rows": "3"
+                    })
+                    .css({
+                        "width": "100%",
+                        "margin-bottom": "10px"
+                    })
+                    .text(data.contents);
+
+                updateComment.append(updateTextarea, $("<br>"))
+
+                // 수정/취소 버튼
+                let btnDoCoEdit = $("<button>")
+                    .addClass("btn btn-outline-primary btn-sm")
+                    .attr("type", "button")
+                    .css("margin-right", "5px")
+                    .text("수정")
+                    .click(function () {
+                        doCommentEdit(data.commentSeq);
+                    });
+
+                // 취소
+                let btnShowHideArea = $("<button>")
+                    .addClass("btn btn-outline-secondary btn-sm")
+                    .text("취소")
+                    .click(function () {
+                        showHideArea(data.commentSeq);
+                    });
+
+                updateComment.append($("<div>")
+                    .css("text-align", "right")
+                    .append(btnDoCoEdit, btnShowHideArea)
+                )
+
+                td.append(updateComment);
+
+                row.append(td);
+                commentList.append(row);
+
+            });
+            $("div[id^='updateComment']").hide();
+            $("div[id^='updateRecomment']").hide();
+            $("div[id^='reCommentArea']").hide();
+            $(".readTextarea").each(function () {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+
+        // 댓글 수정
+        function doCommentEdit(commentSeq) {
+
+            console.log("commentSeq: " + commentSeq); // commentSeq 값을 로그로 확인
+
+            const upComment = document.getElementById("upComment_" + commentSeq).value;
+            const boardSeq = document.getElementById("nSeq").value;
+
+            console.log("upComment : " + upComment)
+
+
+            if (!upComment) {
+                console.error("Cannot find element with id: upComment_" + commentSeq);
+                return;
+            }
+            if (!boardSeq) {
+                console.error("Cannot find element with id: boardSeq");
+                return;
+            }
+
+            if (upComment === "") {
+                alert("내용을 작성하세요.");
+                document.getElementById("upComment_" + commentSeq).focus();
+                return;
+
+            }
+
+            const requestData = {
+                upComment: upComment,
+                boardSeq: boardSeq,
+                commentSeq: commentSeq,
+            };
+
+            $.ajax({
+                url: "/comment/updateComment",
+                type: "post",
+                dataType: "JSON",
+                data: requestData,
+                success: function (json) {
+
+                    alert(json.msg);
+
+                    if (json.result === 1) {
+                        getCommentList()
+                    }
+                }
+            })
+
+
+        }
+
+        // 댓글 삭제
+        function doDeleteComment(commentSeq) {
+
+            const upComment = document.getElementById("upComment_" + commentSeq).value;
+            const boardSeq = document.getElementById("nSeq").value;
+
+            console.log("commentSeq : " + commentSeq);
+            console.log("upComment : " + upComment);
+            console.log("boardSeq : " + boardSeq);
+
+
+            if (!confirm("삭제하시겠습니까?")) {
+                return;
+            }
+
+            const requestData = {
+                upComment: upComment,
+                boardSeq: boardSeq,
+                commentSeq: commentSeq,
+            };
+            $.ajax({
+                url: "/comment/deleteComment",
+                type: "post",
+                dataType: "JSON",
+                data: requestData,
+                success: function (json) {
+                    alert(json.msg);
+
+                    if (json.result === 1) {
+                        getCommentList()
+                    }
+                }
+            })
+
+
+        }
+
+        // 댓글 수정 버튼 클릭 시 수정 폼 보여주기.
+
+        function showEditArea(commentSeq) {
+            event.preventDefault(); // 기본 동작 방지
+            $("#baseComment_" + commentSeq).hide();
+            $("#updateComment_" + commentSeq).show();
+            console.log("commentSeq : " + commentSeq);
+
+        }
+
+        function showHideArea(commentSeq) {
+            event.preventDefault();  // 기본 동작 방지
+            $("#baseComment_" + commentSeq).show();
+            $("#updateComment_" + commentSeq).hide();
+            console.log("commentSeq : " + commentSeq);
+        }
+
+
         function logout() {
             $.ajax({
                 type: "post",
                 url: "/user/logout",
-                success: function(json) {
-                    if(json.result = 1) {
+                success: function (json) {
+                    if (json.result = 1) {
                         alert(json.msg);
                         window.location.reload();
                     }
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log(error);
                     alert("로그아웃 실패");
                 }
             })
         }
 
-        function doCommentInsert() {
-            let f = document.getElementById("f");
-
-            if (f.comment.value === "") {
-                alert("댓글을 입력하시기 바랍니다.");
-                f.comment.focus();
-                return;
-            }
-            $.ajax({
-                url: "/comment/insertComment",
-                type: "post",
-                dataType: "JSON",
-                data: $("#f").serialize(),
-                success: function (json) {
-                    alert(json.msg);
-                    window.location.reload();
-
-                }
-            });
-        }
 
         function doEdit() {
             if (ssNickName === nickName) {
-                location.href = "/board/boardEditInfo?nSeq=" + nSeq;
+                location.href = "/board/boardEditInfo?nSeq=" + document.getElementById("nSeq").value;
 
             } else if (session_user_id === "") {
                 alert("로그인 하시길 바랍니다.");
@@ -108,6 +434,9 @@
         }
 
 
+        /**
+         * 게시글 삭제
+         */
         function doDelete() {
 
             if (confirm("작성한 글을 삭제하시곘습니까?")) {
@@ -127,6 +456,7 @@
 
         }
 
+
         /*]]>*/
     </script>
     <style>
@@ -141,30 +471,31 @@
 <header id="header" class="header fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-        <a href="index.html" class="logo d-flex align-items-center">
+        <a href="/main" class="logo d-flex align-items-center">
             <img src="/images/img/logo.png" alt="">
             <span>GradeAdvisor</span>
         </a>
+        <input type="hidden" id="regId">
 
 
-                <nav id="navbar" class="navbar">
-                    <ul>
-                        <li><a class="nav-link scrollto" href="/main">홈</a></li>
-                        <li><a class="nav-link scrollto" href="/user/myPage">마이 페이지</a></li>
-                        <li><a class="active" href="/board/mainBoard">게시판</a></li>
-                        <li><a class="nav-link scrollto" href="/depart/getDepart">학과 정보</a></li>
-                        <li><a class="nav-link scrollto" href="/grade/gradeRes">합격률 예측</a></li>
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a class="nav-link scrollto" href="/main">홈</a></li>
+                <li><a class="nav-link scrollto" href="/user/myPage">마이 페이지</a></li>
+                <li><a class="active" href="/board/mainBoard">게시판</a></li>
+                <li><a class="nav-link scrollto" href="/depart/getDepart">학과 정보</a></li>
+                <li><a class="nav-link scrollto" href="/grade/gradeRes">합격률 예측</a></li>
 
 
-                        <li th:unless="${globalSession}">
-                            <a class="getstarted scrollto" href="/user/login">로그인</a>
-                        </li>
-                        <li th:if="${globalSession}">
-                            <a class="getstarted scrollto" id="logout"> 로그아웃</a>
-                        </li>
-                    </ul>
-                    <i class="bi bi-list mobile-nav-toggle"></i>
-                </nav><!-- .navbar -->
+                <li th:unless="${globalSession}">
+                    <a class="getstarted scrollto" href="/user/login">로그인</a>
+                </li>
+                <li th:if="${globalSession}">
+                    <a class="getstarted scrollto" id="logout"> 로그아웃</a>
+                </li>
+            </ul>
+            <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
 
 
     </div>
@@ -195,7 +526,7 @@
                     <span itemprop="pulishel" th:text="${rDTO.nickName()}"></span>
                     <span class="sp"></span>
                     <i class="fa fa-comment">
-                        </i>
+                    </i>
                     <b class="red">
                         <img src="/images/eye_icon.png" th:text="${rDTO.readCnt()}">
                     </b>
@@ -213,7 +544,14 @@
                     <div style="width: 90%; height: 50%; padding-bottom: 10px" id="img" th:each="dto : ${rList}">
                         <img th:src="${dto.saveFileUrl()}" width="50%"><br><br>
                     </div>
-                    <div th:text="${rDTO.contents()}"> </div>
+                    <div th:text="${rDTO.contents()}"></div>
+
+                    <div class="like-container">
+                        <button id="toggle_heart" class="like-button">좋아요</button>
+                        <div id="like_count" class="like-count">
+                            좋아요 수 : <span th:text="${rDTO.likeCount()}"></span>
+                        </div>
+                    </div>
 
 
                 </div>
@@ -221,44 +559,29 @@
         </div>
 
 
-            <div th:if = "${nk}">
-                <button id="btnEdit" type="button" class="btn btn-info">수정</button>
-                <button id="btnDelete" type="button" class="btn btn-danger">삭제</button>
-            </div>
+        <div th:if="${nk}">
+            <button id="btnEdit" type="button" class="btn btn-info">수정</button>
+            <button id="btnDelete" type="button" class="btn btn-danger">삭제</button>
+        </div>
 
     </section>
 
 
-    <!-- 댓글 입력 폼 -->
-    <div class="card">
-        <div class="card-header bi bi-chat-dots">
-            <span th:if="${cList.size() != null and cList.size() > 0}"
-                  th:text="${cList.size()} + 'Comments' ">댓글 수: 0</span>
-            <span th:if="${cList == null or cList.size() == 0}">댓글 없음</span>
+    <ul class="list-group-flush">
+        <div id="commentList" class="comment-list"></div>
+    </ul>
 
-        </div>
-        <!--    댓글 내용 부분-->
-        <ul class="list-group-flush">
-            <li th:each="cDTO : ${cList}" class="list-group-item">
-            <span>
-                <span th:text="${cDTO.nickName()}" style="font-size: small"></span>
-                <span th:text="${cDTO.regDt()}" style="font-size: xx-small"></span>
-            </span>
-                <div th:text="${cDTO.comment()}"></div>
-            </li>
-        </ul>
-    </div>
-    <br/>
     <div class="card">
         <div class="card-header bi bi-chat-right-dots">댓글 작성</div>
-        <input type="hidden" name="nSeq" th:value="${rDTO.boardSeq()}"/>
+        <input type="hidden" id="nSeq" name="nSeq" th:value="${rDTO.boardSeq()}"/>
         <div th:if="${globalSession}">
             <div class="card-body">
-                <textarea id="comment" name="comment" class="form-control" rows="4" placeholder="댓글을 입력하세요"></textarea>
+                <textarea id="commentContents" name="commentContents" class="form-control" rows="4"
+                          placeholder="댓글을 입력하세요"></textarea>
             </div>
-
             <div class="card-footer">
-                <button type="button" id="btnCommentInsert" class="btn btn-outline-primary bi bi-pencil-square">등록
+                <button type="button" id="btnComment" class="btn btn-outline-primary bi bi-pencil-square"
+                        onclick="insertComment(0)">등록
                 </button>
             </div>
         </div>
@@ -268,6 +591,7 @@
             </div>
         </div>
     </div>
+
 </form>
 </body>
 

@@ -28,9 +28,16 @@ public interface IUserInfoService {
 
 
 
-     UserInfoDTO getMyInfo(UserInfoDTO pDTO) throws Exception;
+     UserInfoDTO getMyInfo( String userId) throws Exception;
 
      void newPassword2(String userId, String newPassword, String email, String userName) throws Exception;
 
      void deleteUserInfo(String userId) throws Exception;
+
+
+     String getUserIdExistsKakao(final String userId) throws Exception;
+
+    int insertUserInfokakao(String userId, String password, String email, String nickname, String userName) throws Exception;
+
+    void deleteUserToken(String userId);
 }

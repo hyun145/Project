@@ -26,41 +26,109 @@
     <link rel="stylesheet" href="/css/table.css"/>
     <link href="/css/mainForm/board.css" rel="stylesheet">
     <link href="/css/mainForm/style.css" rel="stylesheet">
+    <script type="text/javascript" src="/js/pagination.js"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
+
+        let currentPage
+
         function doDetail(seq) {
             location.href = "/board/boardInfo?nSeq=" + seq;
         }
 
         $(document).ready(function () {
 
-            $("#btnSearch").on("click", function () {
-                let f = document.getElementById("f");
+            getBoardList();
 
-                if (f.keyword.value === "") {
-                    alert("검색어를 입력해주세요.");
-                    f.keyword.focus();
-                    return;
-                }
 
-                /*   $.ajax({
-                       url: "/board/boardDelete",
-                       type: "post",
-                       dataType: "JSON",
-                       data: {"nSeq": nSeq},
-                       success:
-                           function (json) {
-                               alert(json.msg);
-                               location.href = "/board/mainBoard?page=1";
-                           }
-                   })*/
-
-            })
             $("#logout").on("click", function () {
                 logout();
             })
 
+            $("#btnSend").on("click", function () {
+                getBoardList();  // 검색 버튼 클릭 시 게시물 목록 가져오기
+            });
         })
+
+        function getBoardList() {
+
+            const urlParams = new URL(location.href).searchParams;
+            currentPage = urlParams.get('page');
+            let keyword = urlParams.get('keyword');
+
+            // page 값이 null이거나 빈 문자열인 경우 0으로 초기화
+            if (currentPage === null || currentPage.trim() === "") {
+                currentPage = 1;
+            } else {
+                currentPage = parseInt(currentPage, 10);
+
+                // page 값이 NaN이거나 음수인 경우 0으로 초기화
+                if (isNaN(currentPage) || currentPage < 0) {
+                    currentPage = 1;
+                }
+            }
+
+            currentPage++
+
+            $.ajax({
+                url: "/board/getBoardList",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    page: currentPage,
+                    keyword: keyword
+                },
+                success: function (json) {
+                    console.log(json);
+
+                    insertData(json.content)
+                    pagination(json.totalPages, currentPage)
+
+                    document.getElementById("keyword").value = keyword
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX 호출 중 에러 발생:", error);
+                }
+            });
+        }
+
+        function insertData(bList) {
+            let list = $("#boardList");
+            list.empty();
+
+            bList.forEach(function (data) {
+                let listOne = $("<div>")
+                    .addClass("listOne item")
+                    .click(function () {
+                        doDetail(data.boardSeq)
+                    });
+
+                let title = $("<div>")
+                    .text(data.title);
+
+                if (data.fileYn === "Y") {
+                    let fileYn = $("<i>")
+                        .addClass("fa-solid fa-image");
+                    title.append(fileYn);
+                }
+                listOne.append(title);
+
+
+                let nickName = $("<div>")
+                    .text(data.nickName);
+                listOne.append(nickName);
+
+                let regDt = $("<div>")
+                    .text(data.regDt);
+                listOne.append(regDt);
+
+                let readCnt = $("<div>")
+                    .text(data.readCnt);
+                listOne.append(readCnt);
+
+                list.append(listOne);
+            });
+        }
 
         function logout() {
             $.ajax({
@@ -79,44 +147,73 @@
             })
         }
 
-        function navigate(page) {
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('page', page);
-            window.location.search = urlParams.toString();
-        }
 
     </script>
 
     <style>
-        .pagination {
+        #boardContainer {
+            width: 90%; /* 넓이를 90%로 확장 */
+            margin: 0 auto;
+            border-collapse: collapse;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+        }
+
+        .board-header {
             display: flex;
-            justify-content: center;
-            margin-top: 20px;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #f1f3f5;
+            font-weight: bold;
+            color: #343a40;
+            border-bottom: 2px solid #dee2e6;
         }
 
-        .pagination-list {
-            list-style-type: none;
-            padding: 0;
+        .board-header .header-item, .board-list .listOne div {
+            width: 25%; /* 모든 항목의 너비를 동일하게 */
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* listOne 스타일 수정 */
+        .board-list .listOne {
             display: flex;
-            gap: 5px;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.3s ease;
         }
 
-        .pagination-list a {
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            color: #007bff;
-            text-decoration: none;
+        .board-list .listOne:hover {
+            background-color: #f8f9fa;
         }
 
-        .pagination-list a.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
+        .board-list .listOne div {
+            text-align: center;
+            font-size: 14px;
+            color: #110104;
         }
 
-        .pagination-list a:hover {
-            background-color: #ddd;
+        .board-list .listOne div:first-child {
+            font-weight: bold;
+            color: #000102;
         }
+
+        .board-list .listOne div:nth-child(2) {
+            font-weight: normal;
+        }
+
+        .board-list .listOne div:nth-child(3) {
+            color: #130101;
+        }
+
+        .board-list .listOne div:nth-child(4) {
+            color: #180505;
+        }
+
     </style>
 
 </head>
@@ -142,10 +239,10 @@
                 <li><a class="nav-link scrollto" href="/depart/getDepart">학과 정보</a></li>
                 <li><a class="nav-link scrollto" href="/grade/gradeInput">성적 입력</a></li>
                 <li><a class="nav-link scrollto" href="/grade/gradeRes">합격률 예측</a></li>
-                <li th:unless="${nickNameCheck}">
+                <li th:unless="${globalSession}">
                     <a class="getstarted scrollto" href="/user/login">로그인</a>
                 </li>
-                <li th:if="${nickNameCheck}">
+                <li th:if="${globalSession}">
                     <a class="getstarted scrollto" id="logout"> 로그아웃</a>
                 </li>
             </ul>
@@ -181,83 +278,40 @@
     <div class="footer-newsletter">
         <div class="container">
 
-            <!--  <div class="footer-newsletter">
-                  <form action="/board/searchBoard" method="get">
-                      <input type="text" name="keyword" th:value="${keyword}" placeholder="Search..."/>
-                      <button type="submit">Search</button>
-                  </form>-->
-
-            <div id="board-search">
-                <div class="search-window">
-                    <form action="/board/searchBoard" method="get">
-                        <div class="search-wrap">
-                            <input type="text" name="keyword" th:value="${keyword}"  placeholder="제목 입력"/>
-                            <button class="btn btn-dark">검색</button>
-                        </div>
-                    </form>
+            <form class="form-inline my-2 my-lg-0 d-flex justify-content-center" id="f">
+                <div class="col-9">
+                    <div class="input-group mb-3">
+                        <input class="form-control btn-rounded-none mr-sm-2" type="search" placeholder="Search"
+                               name="keyword" id="keyword">
+                        <button type="submit" class="btn btn-dark my-2 my-sm-0 btn-rounded-none" id="btnSend">검색
+                        </button>
+                    </div>
                 </div>
-            </div>
-
-            <div th:if="${nickNameCheck}">
+            </form>
+            <div th:if="${globalSession}">
                 <button onclick="location.href='/board/boardReg'" class="btn btn-secondary">글쓰기</button>
                 <button onclick="location.href='/user/myPage'" class="btn btn-secondary">마이페이지</button>
             </div>
 
-
-            <div id="board-list">
-                <div class="container">
-                    <div class="board-div">
-                        <div class="board-row board-header">
-                            <div class="board-cell th-title">제목</div>
-                            <div class="board-cell th-nickName">닉네임</div>
-                            <div class="board-cell th-date">등록일</div>
-                            <div class="board-cell th-cnt">조회수</div>
-                        </div>
-                        <div class="board-row" th:each="dto : ${rList}">
-                            <div class="board-cell title" th:text="${dto.title()}"
-                                 th:onclick="doDetail([[${dto.boardSeq}]])"></div>
-                            <div class="board-cell nickName" th:text="${dto.nickName()}"></div>
-                            <div class="board-cell date" th:text="${dto.regDt()}"></div>
-                            <div class="board-cell cnt" th:text="${dto.readCnt()}"></div>
-                        </div>
-                    </div>
+            <div class="mb-5" id="boardContainer" style="text-align: center">
+                <div class="header board-header">
+                    <div class="header-item">제목</div>
+                    <div class="header-item">작성자</div>
+                    <div class="header-item">등록일</div>
+                    <div class="header-item">조회수</div>
                 </div>
-            </div>
-            <!-- 페이지 번호를 표시하는 부분 -->
-            <div style="display: flex; display: block;">
-                <div class="pagination">
-                    <ul class="pagination pagination-primary" id="pagination">
-                        <li class="page-item">
-                            <a class="page-link" th:href="@{/board/mainBoard?page=1}">&laquo;</a>
-                        </li>
-                        <!-- 이전 페이지로 이동하는 링크 -->
-                        <li class="page-item" th:if="${currentPage > 1}">
-                            <a class="page-link"
-                               th:href="@{/board/mainBoard(page=${currentPage - 1})}">&lt;</a>
-                        </li>
-                        <!-- 현재 페이지 주변에 페이지 번호 링크 표시 -->
-                        <th:block
-                                th:each="pageNumber : ${#numbers.sequence(T(java.lang.Math).max(1, currentPage - 5), T(java.lang.Math).min(totalPages, currentPage + 5))}">
-                            <li class="page-item"
-                                th:class="${pageNumber == currentPage ? 'active' : ''}">
-                                <a class="page-link" th:href="@{/board/mainBoard(page=${pageNumber})}"
-                                   th:text="${pageNumber}"></a>
-                            </li>
-                        </th:block>
-                        <!-- 다음 페이지로 이동하는 링크 -->
-                        <li class="page-item" th:if="${currentPage < totalPages}">
-                            <a class="page-link"
-                               th:href="@{/board/mainBoard(page=${currentPage + 1})}">&gt;</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" th:href="@{/board/mainBoard(page=${totalPages})}">&raquo;</a>
-                        </li>
-                    </ul>
-                </div>
+                <div id="boardList" class="board-list"></div>
             </div>
 
 
         </div>
+        <!-- 페이지 번호를 표시하는 부분 -->
+        <div class="center-pagination d-flex justify-content-center mb-3">
+            <ul class="pagination" id="pagination">
+            </ul>
+        </div>
+
+    </div>
 
 
     </div>

@@ -9,14 +9,17 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
-    List<CommentEntity> findAllByOrderByCommentSeqDesc();
+    List<CommentEntity> findByBoardSeqOrderByCommentSeq(Long boardSeq) throws Exception;
 
-    List<CommentEntity> findAllByCommentSeq(Long noticeSeq);     // 댓글 수정
+    CommentEntity findByRegDt(String regDt) throws Exception;
 
+    CommentEntity findTopByBoardSeq(Long boardSeq) throws Exception;
 
-    List<CommentEntity> findAllByBoardSeq(Long noticeSeq);
+    Long countByBoardSeq(Long boardSeq) throws Exception;
 
+    CommentEntity findTopByBoardSeqOrderByCommentSeqDesc(Long boardSeq) throws Exception;
 
-    void deleteByNickName(String nickName);
+    List<CommentEntity> findByBoardSeqAndCommentSeq(Long boardSeq,Long commentSeq) throws Exception;
+
 
 }

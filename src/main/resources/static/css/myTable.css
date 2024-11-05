@@ -2,6 +2,8 @@
     display: table;
     border: 1px solid black;
     border-collapse: collapse;
+    width: 70%; /* 가로 폭을 70%로 설정 */
+    margin: 0 auto; /* 테이블을 중앙 정렬 */
 }
 .table .thead {
     display: table-header-group;

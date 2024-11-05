@@ -5,7 +5,7 @@ import hyun.project.dto.MsgDTO;
 import hyun.project.dto.UserInfoDTO;
 import hyun.project.repository.entity.BoardEntity;
 import hyun.project.service.IBoardService;
-import hyun.project.service.ICommentService;
+import hyun.project.service.IKakaoService;
 import hyun.project.service.IUserInfoService;
 import hyun.project.util.CmmUtil;
 import hyun.project.util.EncryptUtil;
@@ -31,7 +31,7 @@ public class UserInfoController {
 
     private final IUserInfoService userInfoService;
     private final IBoardService boardService;
-    private final ICommentService commentService;
+    private final IKakaoService kakaoService;
 
 
     /**
@@ -121,17 +121,24 @@ public class UserInfoController {
         UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).build();
 
 
-        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getMyInfo(pDTO))
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getMyInfo(userId))
                 .orElseGet(() -> UserInfoDTO.builder().build());
 
         log.info("userId : " + userId);
         log.info("rDTO : " + rDTO);
-        String tmp = rDTO.email();
-        log.info(tmp);
-        String email = EncryptUtil.decAES128CBC(tmp);
+        log.info("이메일 : " + rDTO.email());
+
+
+        if (rDTO.email() == "NULL" || rDTO.email() == null) {
+            model.addAttribute("email", "이메일이 존재하지 않습니다.");
+            model.addAttribute("rDTO", rDTO);
+        } else {
+
+        String email = EncryptUtil.decAES128CBC(CmmUtil.nvl(rDTO.email()));
         log.info("email : " + email);
         model.addAttribute("email", email);
         model.addAttribute("rDTO", rDTO);
+        }
 
 
         log.info("내 정보 가져오기 컨트롤러 종료");
@@ -312,6 +319,11 @@ public class UserInfoController {
     @PostMapping(value = "logout")
     public MsgDTO logout(HttpSession session) {
         log.info(this.getClass().getName() +".logout Start!");
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+        log.info("userId : " + userId);
+
 
         session.setAttribute("SS_USER_ID", "");
         session.removeAttribute("SS_USER_ID");
@@ -591,6 +603,14 @@ public class UserInfoController {
 
         String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
 
+        if (userId.matches("^kakao_\\d+$")) {
+            kakaoService.deleteToken(
+                    EncryptUtil.decAES128CBC(
+                            userInfoService.getMyInfo(userId).password()
+                    )
+            );
+        }
+
         String nickName = CmmUtil.nvl((String) session.getAttribute("SS_NICK_NAME"));
         log.info("세션에 저장 되있는 유저 아이디 : " + userId);
 
@@ -598,11 +618,17 @@ public class UserInfoController {
 
 
         // 댓글 삭제 .
-
-        commentService.deleteComment(nickName);
+        // 게시물 삭제
+        // 게시글에 좋아요 누른 것 삭제.
         boardService.deleteBoardByUserId(userId);
         userInfoService.deleteUserInfo(userId);
 
+
+        session.setAttribute("SS_USER_ID", "");
+        session.removeAttribute("SS_USER_ID");
+
+        session.setAttribute("SS_NICK_NAME", "");
+        session.removeAttribute("SS_NICK_NAME");
 
 
 
@@ -614,6 +640,22 @@ public class UserInfoController {
     }
 
 
+    @PostMapping("checkKakao")
+    @ResponseBody
+    public MsgDTO checkKakaoAccount(HttpSession session) {
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+       String msg = "";
+       int res = 1;
+        if (userId.matches("^kakao_\\d+$")) {
+
+            return MsgDTO.builder().msg("카카오 계정은 회원 정보 수정이 불가능합니다.")
+                    .result(2).build();
+        }
+       return MsgDTO.builder().result(1)
+               .msg("q").build();
+    }
 
 }
 

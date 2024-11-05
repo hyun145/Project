@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,8 +18,11 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
     /**
      * 공지사항 리스트
      */
-    List<BoardEntity> findAllByOrderByBoardSeqDesc();
+    Page<BoardEntity> findAllByOrderByBoardSeqDesc(Pageable page);
 
+
+    Page<BoardEntity> findByTitleContainingOrderByBoardSeqDesc( Pageable pageable,
+            String keyword);
 
 
 
@@ -32,6 +36,8 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
 
 
 
+
+
     @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE BOARD A SET A.READ_CNT = IFNULL(A.READ_CNT, 0) + 1 WHERE A.BOARD_SEQ = ?1",
             nativeQuery = true)
@@ -39,6 +45,13 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
 
 
 
+    @Modifying
+    @Query("UPDATE BoardEntity b SET b.likeCount = b.likeCount + 1 WHERE b.boardSeq = :boardSeq")
+    void incrementLikeCount(@Param("boardSeq") Long boardSeq);
+
+    @Modifying
+    @Query("UPDATE BoardEntity b SET b.likeCount = b.likeCount - 1 WHERE b.boardSeq = :boardSeq")
+    void decrementLikeCount(@Param("boardSeq") Long boardSeq);
 
 
 }

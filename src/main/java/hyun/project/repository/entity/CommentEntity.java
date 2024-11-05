@@ -1,15 +1,13 @@
 package hyun.project.repository.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import hyun.project.repository.entity.PK.CommentPK;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.time.LocalDateTime;
 
 
 @Getter
@@ -20,35 +18,41 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @Entity
 @Builder
+@IdClass(CommentPK.class)
 public class CommentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "COMMENT_SEQ")
-    private int commentSeq;        // 댓글 순번
+    private Long commentSeq;        // 댓글 순번
 
-    @NonNull
+
+    @Id
     @Column(name= "BOARD_SEQ")
-    private Long boardSeq;      // 게시물 순번
+    private Long boardSeq;
 
-    @NonNull
     @Column(name = "NICKNAME")
-    private String nickName;        // 닉네임
+    private String nickname;
 
 
-    @NonNull
-    @Column(name = "COMMENT")
-    private String comment;        // 댓글 내용
-
-    @NonNull
-    @Column(name = "REG_DT")
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class) //직렬화 역직렬화
-    private LocalDateTime regDt;        // 작성 시간
+    @Column(name = "CONTENTS")
+    private String contents;
 
 
+    @Column(name = "REG_ID")
+    private String regId;
 
 
+    @Column(name = "REG_DT", updatable = false)
+    private String regDt;
 
+    @Column(name = "CHG_DT")
+    private String chgDt;
+
+    @Column(name = "dept", updatable = false)
+    private int dept;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "REG_ID", insertable = false, updatable = false)
+    private UserInfoEntity userInfo;
 
 }

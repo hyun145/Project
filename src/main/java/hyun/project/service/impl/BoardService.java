@@ -29,24 +29,15 @@ public class BoardService implements IBoardService {
     private final BoardRepository boardRepository;
 
 
+
     @Override
-    public List<BoardDTO> getBoardList() {
+    public Page<BoardDTO> getBoardList(Pageable page, String keyword) throws Exception {
 
         log.info(this.getClass().getName() + ".getBoardList Start!");
 
         // 공지사항 전체 리스트 조회하기
-        List<BoardEntity> rList = boardRepository.findAllByOrderByBoardSeqDesc();
 
-        // 엔티티의 값들을 DTO에 맞게 넣어주기
-        List<BoardDTO> nList = new ObjectMapper().convertValue(rList,
-                new TypeReference<>() {
-                });
-
-
-
-        log.info(this.getClass().getName() + ".getBoardList End!");
-
-        return nList;
+        return boardRepository.findByTitleContainingOrderByBoardSeqDesc(page, keyword).map(BoardDTO::fromEntity);
     }
 
     @Transactional(rollbackFor = Exception.class)

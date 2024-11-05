@@ -2,16 +2,14 @@ package hyun.project.controller;
 
 
 import hyun.project.dto.BoardDTO;
-import hyun.project.dto.CommentDTO;
 import hyun.project.dto.FileDTO;
 import hyun.project.dto.MsgDTO;
-import hyun.project.repository.entity.BoardEntity;
 import hyun.project.service.IBoardService;
-import hyun.project.service.ICommentService;
 import hyun.project.service.IFileService;
 import hyun.project.service.IS3Service;
 import hyun.project.util.CmmUtil;
 import hyun.project.util.FileUtil;
+import hyun.project.util.SafeUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +34,7 @@ public class BoardController {
     private final IFileService fileService;
     private final IBoardService boardService;
     private final IS3Service s3Service;
-    private final ICommentService commentService;
+
 
     @GetMapping(value = "boardReg")
     public String boardReg(HttpSession session, ModelMap model) {
@@ -167,7 +164,7 @@ public class BoardController {
 
         log.info(this.getClass().getName() +".userGradeInputForm Start!");
 
-        String nSeq = CmmUtil.nvl(request.getParameter("nSeq"), "0");   // HTMl로부터 전달된 BoardSeq 값을 받기.
+        String nSeq = CmmUtil.nvl(request.getParameter("nSeq"));   // HTMl로부터 전달된 BoardSeq 값을 받기.
 
         String ssNickName =CmmUtil.nvl((String) session.getAttribute("SS_NICK_NAME"));
 
@@ -180,8 +177,7 @@ public class BoardController {
 
         BoardDTO pDTO = BoardDTO.builder().boardSeq(Long.parseLong(nSeq)).build();
 
-        CommentDTO cDTO = CommentDTO.builder()
-                .boardSeq(Long.parseLong(nSeq)).build();
+
 
 
         List<FileDTO> rList = fileService.getFilePath(Long.parseLong(nSeq));
@@ -195,8 +191,6 @@ public class BoardController {
         String nik = CmmUtil.nvl(rDTO.nickName());
         log.info("nik : " + nik);
 
-        List<CommentDTO> cList = Optional.ofNullable(commentService.getCommentList(cDTO))
-                        .orElseGet(ArrayList::new);
 
         if (ssNickName.equals(rDTO.nickName())) {
             model.addAttribute("nk", 1);
@@ -221,10 +215,6 @@ public class BoardController {
         model.addAttribute("rDTO", rDTO);
 
         model.addAttribute("rList", rList);
-
-
-
-        model.addAttribute("cList", cList);
 
         log.info(this.getClass().getName() +".게시글 상세보기 컨트롤러 End!");
 
@@ -378,119 +368,29 @@ public class BoardController {
 
 
     @GetMapping(value = "mainBoard")
-    public String boardList(@RequestParam(defaultValue = "1")int page, HttpSession session, ModelMap model)
-            throws Exception {
-
-        // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".mainBoard Start!");
-
-        // 로그인된 사용자 아이디는 Session에 저장함
-
-        String ssNickName = (String) session.getAttribute("SS_NICK_NAME");
-        String ssUserId = (String) session.getAttribute("SS_USER_ID");
-
-
-        log.info("세션에 저장되있는 사용자 닉네임: " + ssNickName);
-        log.info("세션에 저장되있는 사용자 아이디: " + ssUserId);
-
-        // 공지사항 리스트 조회하기
-        // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
-        List<BoardDTO> rList = Optional.ofNullable(boardService.getBoardList())
-                .orElseGet(ArrayList::new);
-
-        if ( "null".equals(ssNickName) || "".equals(ssNickName) || ssNickName == null) {
-            model.addAttribute("nickNameCheck", 0);
-
-        } else {
-
-            model.addAttribute("nickNameCheck", 1);
-        }
-
-
-
-        // 조회된 리스트 결과값 넣어주기
-        log.info("rList : " + rList);
-        // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
-
-        // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
-        int itemsPerPage = 10;    // 페이지당 보여줄 게시판 개수 정의.
-
-        int totalItems = rList.size();  // 페이지네이션을 위한 전체 개수
-
-        int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
-
-
-        // 현재 페이지에 해당하는 게시글만 선택하여 rList에 할당.
-        int fromIndex = (page - 1) * itemsPerPage;
-        int toIndex = Math.min(fromIndex + itemsPerPage, totalItems);
-        rList = rList.subList(fromIndex, toIndex);
-
-        model.addAttribute("rList", rList);
-
-        model.addAttribute("currentPage", page);
-
-        model.addAttribute("totalPages", totalPages);
-
-        log.info(this.getClass().getName() + ".mainBoard End!");
-
+    public String mainBoard() {
         return "board/mainBoard";
+    }
+    @ResponseBody
+    @PostMapping("getBoardList")
+    public Page<BoardDTO> getBoardList(HttpServletRequest request) throws Exception {
+        log.info("게시글 리스트 가져오기 컨트롤러 시작");
 
+        String keyword = CmmUtil.nvl(request.getParameter("keyword"));
+        int page = SafeUtil.safeParseInt(  // 값이 없을 경우 기본값으로 0을 사용
+                request.getParameter("page"), 0
+        );
+
+        log.info("keyword : " + keyword);
+        log.info("page : " + page);
+
+
+        log.info("게시글 리스트 가져오기 컨트롤러 종료");
+        return boardService.getBoardList(
+                PageRequest.of(page-2, 10), keyword);
     }
 
 
-    @GetMapping(value = "searchBoard")
-    public String searchTitle(@RequestParam (value = "keyword") String keyWord,
-                              @RequestParam (defaultValue = "1") int page, ModelMap model) throws Exception {
-        log.info(this.getClass().getName() +".searchTitle Start!");
-
-
-        log.info("키워드 : " + keyWord);
-
-        BoardDTO pDTO = BoardDTO.builder().title(keyWord).build();    // 키워드 검색
-
-        List<BoardDTO> rList;
-        rList = boardService.boardSearchList(pDTO);   // 리스트에 담아두고,
-
-
-        log.info("rList : " + rList);
-
-
-        int itemsPerPage = 10;    // 페이지당 보여줄 게시판 개수 정의.
-
-        int totalItems = rList.size();
-
-        int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
-
-        // 현재 페이지에 해당하는 게시글만 선택하여 rList에 할당.
-        int fromIndex = (page - 1) * itemsPerPage;
-        int toIndex = Math.min(fromIndex + itemsPerPage, totalItems);
-        rList = rList.subList(fromIndex, toIndex);
-
-        if (rList.size() == 0) {
-            rList = new ArrayList<>();
-            String msg = "검색 결과가 없습니다.";
-            String url = "board/mainBoard?page=1";
-            model.addAttribute("msg", msg);
-            model.addAttribute("url", url);
-
-            return "redirect:/board/mainBoard";
-        }
-
-        model.addAttribute("totalItems", totalItems);
-
-        model.addAttribute("rList", rList);
-
-        model.addAttribute("rList", rList);
-
-        model.addAttribute("currentPage", page);
-
-        model.addAttribute("totalPages", totalPages);
-
-        log.info(this.getClass().getName() +".searchTitle End!");
-
-        return "board/mainBoard";
-
-    }
 
 
 

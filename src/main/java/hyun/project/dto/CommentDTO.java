@@ -1,12 +1,7 @@
 package hyun.project.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import hyun.project.repository.entity.CommentEntity;
 import lombok.Builder;
-
-import java.time.LocalDateTime;
 
 @Builder
 public record CommentDTO
@@ -16,18 +11,46 @@ public record CommentDTO
 
         Long boardSeq, //게시글 번호
 
-        String nickName, //작성자 닉네임
+        String nickname, //작성자 닉네임
 
-        String comment, //댓글 내용
+        String contents, //댓글 내용
 
-        @JsonSerialize(using = LocalDateTimeSerializer.class)
-        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-        LocalDateTime regDt //등록 시간
+        String regDt,   // 작성 시간
+
+        String chgDt,   // 수정 시간
+
+        String regId,    // 작성자
 
 
-
+        int dept
 
 )
+
+
 {
+
+        public static CommentDTO from(CommentEntity entity) {
+                return CommentDTO.builder()
+                        .commentSeq(entity.getCommentSeq())
+                        .boardSeq(entity.getBoardSeq())
+                        .regId(entity.getRegId())
+                        .contents(entity.getContents())
+                        .regDt(entity.getRegDt())
+                        .chgDt(entity.getChgDt())
+                        .dept(entity.getDept())
+                        .nickname(entity.getUserInfo().getNickName()).build();
+        }
+
+        public static CommentDTO myComment(CommentEntity entity) {
+                return CommentDTO.builder()
+                        .commentSeq(entity.getCommentSeq())
+                        .boardSeq(entity.getBoardSeq())
+                        .regId(entity.getRegId())
+                        .contents(entity.getContents())
+                        .regDt(entity.getRegDt())
+                        .dept(entity.getDept())
+                        .chgDt(entity.getChgDt())
+                        .build();
+        }
 
 }

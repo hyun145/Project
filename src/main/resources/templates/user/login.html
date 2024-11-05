@@ -43,6 +43,12 @@
             $("#btnMain").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
                 location.href = "/main";
             })
+            $("#btnKakaoLogin").on("click", function () {
+                location.href = "https://kauth.kakao.com/oauth/authorize?" +
+                    "client_id=efad79387c54e11264621e4936fd5e19&" +
+                    "redirect_uri=https://gradeadvisor.store/auth/kakao/callback&" +
+                    "response_type=code"
+            })
 
 
             // 로그인
@@ -121,11 +127,19 @@
                             <button class="login100-form-btn" id="btnLogin" type="button">
                                 로그인
                             </button>
+
+
                         </div>
                         <div class="wrap-login100-form-btn" style="margin-top: 5%">
                             <div class="login100-form-bgbtn"></div>
                             <button class="login100-form-btn" id="btnMain" type="button">메인</button>
                         </div>
+                    </div>
+                    <div id="other_login" class="otherButton text-center">
+                        <span class="text-secondary">다른 계정으로 로그인</span>
+                        <button type="button" id="btnKakaoLogin" class="btn btn-rounded-none btn-box-shadow-none" style="padding: 10px; background-color: #FEE500; border: none;">
+                            <img src="/images/kakao_login_medium.png" alt="카카오로그인" style="max-width: 100%; height: auto; width: 100px;"> <!-- 크기를 120px로 줄임 -->
+                        </button>
                     </div>
 
                     <div class="text-center p-t-115">

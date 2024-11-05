@@ -11,7 +11,7 @@ import java.util.List;
 public interface IBoardService {
 
 
-    List<BoardDTO> getBoardList();
+    Page<BoardDTO> getBoardList(Pageable page, String keyword) throws Exception;
 
     BoardDTO getBoardInfo(BoardDTO pDTO, boolean type) throws Exception; // 공지사항 상세 가져오기 위한 정보  type : 조회수 증가 여부
 

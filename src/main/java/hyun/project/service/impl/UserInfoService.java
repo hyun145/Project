@@ -4,6 +4,7 @@ package hyun.project.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hyun.project.dto.MailDTO;
 import hyun.project.dto.UserInfoDTO;
+import hyun.project.repository.HeartRepository;
 import hyun.project.repository.UserInfoRepository;
 import hyun.project.repository.entity.UserInfoEntity;
 import hyun.project.service.IMailService;
@@ -28,6 +29,8 @@ public class UserInfoService implements IUserInfoService {
     private final UserInfoRepository userInfoRepository;
 
     private final IMailService mailService;
+
+    private final HeartRepository heartRepository;
 
     private EntityManager entityManager;
 
@@ -236,9 +239,8 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
-    public UserInfoDTO getMyInfo(UserInfoDTO pDTO) throws Exception {
+    public UserInfoDTO getMyInfo(String userId) throws Exception {
 
-        String userId = CmmUtil.nvl(pDTO.userId());
 
         Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
         UserInfoEntity pEntity = rEntity.get();
@@ -279,11 +281,14 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
+    @Transactional
     public void deleteUserInfo(String userId) throws Exception {
 
         log.info("유저 삭제 서비스 시작");
 
+        heartRepository.deleteByUserId(userId);
         userInfoRepository.deleteById(userId);
+
 
 
         log.info("유저 삭제 서비스 종료");
@@ -425,6 +430,90 @@ public class UserInfoService implements IUserInfoService {
     }
 
 
+    @Override
+    public String getUserIdExistsKakao(final String userId) throws Exception {
+
+     log.info("카카오 아이디 중복 서비스 시작");
+
+     String existsYn;
+
+     log.info("userId : " + userId);
+
+     Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+
+     if (rEntity.isPresent()) {
+         existsYn = "N";
+     } else {
+         existsYn = "Y";
+     }
+
+
+
+     log.info("카카오 아이디 중복 서비스 종료");
+
+     return existsYn;
+
+    }
+
+    @Override
+    public int insertUserInfokakao(String userId, String password, String email, String nickname, String userName) throws Exception {
+
+        log.info("카카오  회원가입 시작.");
+        int res = 0;
+
+        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+
+        if (rEntity.isPresent()) {
+            res = 2;
+        } else {
+
+            UserInfoEntity pEntity = UserInfoEntity.builder()
+                    .userId(userId)
+                    .password(password)
+                    .email(email)
+                    .nickName(nickname)
+                    .userName(nickname)
+                    .regId(nickname)
+                    .chgId("KAKAOUSER")
+
+                    .build();
+            userInfoRepository.save(pEntity);
+            rEntity = userInfoRepository.findByUserId(userId);
+
+            if (rEntity.isPresent()) {
+                res = 1;
+            }
+        }
+
+        log.info("카카오  회원가입 종료.");
+        return res;
+    }
+
+    /**
+     * 카카오 회원 토큰 값 삭제 테스트.
+     */
+    @Override
+    public void deleteUserToken(String userId) {
+
+        Optional<UserInfoEntity> user = userInfoRepository.findByUserId(userId);
+
+        if (user.isPresent()) {
+        log.info("카카오 회원 토큰 값 삭제 서비스 시작");
+
+
+            UserInfoEntity updatedUserInfo = UserInfoEntity.builder()
+                    .userId(user.get().getUserId())       // 기존 userId 유지
+                    .email(user.get().getEmail())         // 기존 email 유지
+                    .nickName(user.get().getNickName())   // 기존 nickname 유지
+                    .userName(user.get().getUserName())   // 기존 username 유지
+                    .password("")                         // 토큰 값 (비밀번호) 초기화
+                    .build();
+
+            userInfoRepository.save(updatedUserInfo);
+
+        }
+
+    }
 
 
 }
